@@ -14,6 +14,13 @@ function getSheets() {
 
 const SHEET_ID = process.env.GOOGLE_SHEETS_ID!;
 
+/** Map pass name to the correct sheet tab */
+function getTabName(passName: string): string {
+  if (passName === "ATRIANS") return "Atrians";
+  if (passName === "NON-ATRIANS") return "Non-atrians";
+  return "Atrians"; // fallback
+}
+
 export async function appendRegistration(data: {
   registrationId: string;
   timestamp: string;
@@ -36,6 +43,8 @@ export async function appendRegistration(data: {
   const sheets = getSheets();
   const members = [...data.members];
   while (members.length < 4) members.push("");
+
+  const tab = getTabName(data.pass);
 
   const row = [
     data.registrationId,
@@ -62,7 +71,7 @@ export async function appendRegistration(data: {
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
-    range: "Registrations!A:T",
+    range: `${tab}!A:T`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [row] },
   });
@@ -76,28 +85,37 @@ export async function updatePaymentStatus(
   registrationStatus: string
 ) {
   const sheets = getSheets();
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: "Registrations!Q:Q",
-  });
 
-  const rows = response.data.values || [];
-  let rowIndex = -1;
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i][0] === razorpayOrderId) {
-      rowIndex = i + 1;
-      break;
+  // Search both tabs for the order ID
+  for (const tab of ["Atrians", "Non-atrians"]) {
+    try {
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID,
+        range: `${tab}!Q:Q`,
+      });
+
+      const rows = response.data.values || [];
+      let rowIndex = -1;
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i][0] === razorpayOrderId) {
+          rowIndex = i + 1;
+          break;
+        }
+      }
+
+      if (rowIndex === -1) continue;
+
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `${tab}!P${rowIndex}:T${rowIndex}`,
+        valueInputOption: "USER_ENTERED",
+        requestBody: {
+          values: [[paymentStatus, razorpayOrderId, razorpayPaymentId, razorpaySignature, registrationStatus]],
+        },
+      });
+      return; // Found and updated
+    } catch (err) {
+      console.error(`Error searching tab ${tab}:`, err);
     }
   }
-
-  if (rowIndex === -1) return;
-
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: SHEET_ID,
-    range: \`Registrations!P\${rowIndex}:T\${rowIndex}\`,
-    valueInputOption: "USER_ENTERED",
-    requestBody: {
-      values: [[paymentStatus, razorpayOrderId, razorpayPaymentId, razorpaySignature, registrationStatus]],
-    },
-  });
 }
