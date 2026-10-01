@@ -375,8 +375,8 @@ h1 span, h2 span { color: var(--acid); }
   text-transform: uppercase;
   letter-spacing: -.04em;
   color: var(--white);
-  margin-bottom: 40px;
-  text-align: left;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .sponsor-grid-wrapper {

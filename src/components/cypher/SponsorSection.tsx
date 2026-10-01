@@ -29,49 +29,69 @@ export function SponsorSection() {
   return (
     <section className="sponsor-section" ref={containerRef} id="sponsors">
       <div className="shell">
-        {/* Heading */}
-        <h2 className="sponsor-heading sponsor-load-in" style={{ transitionDelay: "100ms" }}>
-          Sponsors
-        </h2>
-
-        {/* Supporting description */}
-        <p
-          className="sponsor-load-in"
+        <div
           style={{
-            transitionDelay: "200ms",
-            maxWidth: "600px",
-            fontSize: "1.1rem",
-            color: "rgba(255, 255, 255, 0.75)",
-            marginBottom: "24px",
-            lineHeight: "1.6",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+            maxWidth: "760px",
+            margin: "0 auto",
           }}
         >
-          Interested in supporting Cypher 4.0 and partnering with next-gen innovators? Explore our sponsorship opportunities and tiers.
-        </p>
+          {/* Heading */}
+          <h2
+            className="sponsor-heading sponsor-load-in"
+            style={{ transitionDelay: "100ms", textAlign: "center", marginBottom: "20px" }}
+          >
+            Sponsors
+          </h2>
 
-        {/* CTA Button linking to Sponsorship Brochure */}
-        <a
-          href={SPONSORSHIP_BROCHURE_PATH}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="sponsor-cta sponsor-load-in"
-          style={{ transitionDelay: "300ms", maxWidth: "420px" }}
-          aria-label="Become a sponsor - Download Sponsorship Brochure"
-        >
-          <span className="sponsor-cta-arrow-track">
-            <span className="sponsor-cta-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-                <path d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
+          {/* Supporting description */}
+          <p
+            className="sponsor-load-in"
+            style={{
+              transitionDelay: "200ms",
+              maxWidth: "600px",
+              fontSize: "clamp(1rem, 2vw, 1.15rem)",
+              color: "rgba(255, 255, 255, 0.75)",
+              marginBottom: "36px",
+              lineHeight: "1.6",
+              textAlign: "center",
+            }}
+          >
+            Interested in supporting Cypher 4.0 and partnering with next-gen innovators? Explore our sponsorship opportunities and tiers.
+          </p>
+
+          {/* CTA Button linking to Sponsorship Brochure */}
+          <a
+            href={SPONSORSHIP_BROCHURE_PATH}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sponsor-cta sponsor-load-in"
+            style={{
+              transitionDelay: "300ms",
+              width: "100%",
+              maxWidth: "380px",
+              margin: "0 auto",
+            }}
+            aria-label="Become a sponsor - Download Sponsorship Brochure"
+          >
+            <span className="sponsor-cta-arrow-track">
+              <span className="sponsor-cta-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                  <path d="M7 17L17 7M17 7H7M17 7V17" />
+                </svg>
+              </span>
             </span>
-          </span>
-          <span className="sponsor-cta-label">
-            <span className="sponsor-roll">
-              <span>Become a sponsor</span>
-              <span>Become a sponsor</span>
+            <span className="sponsor-cta-label">
+              <span className="sponsor-roll">
+                <span>Become a sponsor</span>
+                <span>Become a sponsor</span>
+              </span>
             </span>
-          </span>
-        </a>
+          </a>
+        </div>
       </div>
     </section>
   );
