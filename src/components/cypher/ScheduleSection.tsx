@@ -33,7 +33,7 @@ export function ScheduleSection({
     return () => mediaQuery.removeEventListener("change", handler);
   }, []);
 
-  // Smooth scroll handler for pinned timeline transition
+  // Precise scroll handler for pinned timeline transition
   useEffect(() => {
     if (reducedMotion) return;
 
@@ -42,18 +42,19 @@ export function ScheduleSection({
       if (!sectionRef.current) return;
 
       const rect = sectionRef.current.getBoundingClientRect();
-      const scrollableDistance = rect.height - window.innerHeight;
-      if (scrollableDistance <= 0) return;
+      const topOffset = window.innerWidth <= 900 ? 72 : 85;
+      const shell = sectionRef.current.querySelector<HTMLElement>(".shell");
+      const shellHeight = shell ? shell.offsetHeight : window.innerHeight - topOffset;
+      const pinnedDistance = rect.height - shellHeight;
+      if (pinnedDistance <= 0) return;
 
-      // Calculate progress 0..1 through the section
-      const rawProgress = -rect.top / scrollableDistance;
-      const progress = Math.max(0, Math.min(1, rawProgress));
+      // Scrolled past the point where pinning begins
+      const scrolled = topOffset - rect.top;
+      const progress = Math.max(0, Math.min(1, scrolled / pinnedDistance));
 
-      // 5 equal zones
-      const newIndex = Math.min(
-        tracks.length - 1,
-        Math.max(0, Math.floor(progress * tracks.length))
-      );
+      // Calculate active zone (0 to tracks.length - 1)
+      let newIndex = Math.floor(progress * tracks.length);
+      newIndex = Math.min(tracks.length - 1, Math.max(0, newIndex));
 
       if (newIndex !== activeIndex) {
         onSelect(newIndex);
@@ -65,26 +66,29 @@ export function ScheduleSection({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [tracks.length, activeIndex, onSelect, reducedMotion]);
 
-  // Click on a zone tab -> smoothly scroll to that zone
+  // Click on a zone tab -> smoothly scroll to that exact pinned position
   const scrollToZone = useCallback(
     (index: number) => {
       onSelect(index);
       if (reducedMotion || !sectionRef.current) return;
 
       const rect = sectionRef.current.getBoundingClientRect();
-      const scrollableDistance = rect.height - window.innerHeight;
-      if (scrollableDistance <= 0) return;
+      const topOffset = window.innerWidth <= 900 ? 72 : 85;
+      const shell = sectionRef.current.querySelector<HTMLElement>(".shell");
+      const shellHeight = shell ? shell.offsetHeight : window.innerHeight - topOffset;
+      const pinnedDistance = rect.height - shellHeight;
+      if (pinnedDistance <= 0) return;
 
       const sectionTop = window.scrollY + rect.top;
-      // Target progress is centered in that zone segment
-      const targetProgress = (index + 0.35) / tracks.length;
-      const targetScroll = sectionTop + targetProgress * scrollableDistance;
+      // Position in the center of the zone's scroll slice
+      const targetProgress = (index + 0.5) / tracks.length;
+      const targetScroll = (sectionTop - topOffset) + targetProgress * pinnedDistance;
 
       isClickingTab.current = true;
       window.scrollTo({ top: targetScroll, behavior: "smooth" });
       setTimeout(() => {
         isClickingTab.current = false;
-      }, 700);
+      }, 600);
     },
     [onSelect, tracks.length, reducedMotion]
   );
@@ -100,8 +104,7 @@ export function ScheduleSection({
     const diffX = touchStartX.current - e.changedTouches[0].clientX;
     const diffY = touchStartY.current - e.changedTouches[0].clientY;
 
-    // Horizontal swipe must be greater than vertical movement
-    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY)) {
+    if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
       if (diffX > 0 && activeIndex < tracks.length - 1) {
         scrollToZone(activeIndex + 1);
       } else if (diffX < 0 && activeIndex > 0) {
@@ -112,8 +115,6 @@ export function ScheduleSection({
     touchStartY.current = null;
   };
 
-  const progressPercent = ((activeIndex + 1) / tracks.length) * 100;
-
   return (
     <section
       id="schedule"
@@ -123,7 +124,7 @@ export function ScheduleSection({
       }`}
       aria-label="Event Schedule Timeline"
     >
-      <div className="shell schedule-shell">
+      <div className="shell">
         <div className="section-heading">
           <div>
             <p className="mono-label cyan-text">05 / TIMELINE</p>
@@ -136,32 +137,23 @@ export function ScheduleSection({
           </p>
         </div>
 
-        {/* Timeline progress rail */}
-        <div className="timeline-progress-rail" aria-hidden="true">
-          <div
-            className="timeline-progress-bar"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-
-        {/* Dynamic Card with smooth progressive transition */}
+        {/* Dynamic Card with smooth transitions */}
         <div
-          className={`track-card track-${activeTrack.accent} track-animated`}
-          key={activeTrack.number}
+          className={`track-card track-${activeTrack.accent}`}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="track-content track-content-transition">
+          <div className="track-content">
             <div className="zone-meta-row">
               <span className="zone-tag">ZONE {activeTrack.number}</span>
               <span className="zone-time">
                 <Clock size={13} /> {activeTrack.time}
               </span>
             </div>
-            <h3 className="track-title-transition">{activeTrack.title}</h3>
-            <p className="track-copy-transition">{activeTrack.copy}</p>
+            <h3>{activeTrack.title}</h3>
+            <p>{activeTrack.copy}</p>
           </div>
-          <div className="track-number track-number-transition">
+          <div className="track-number">
             {activeTrack.number}
           </div>
         </div>
