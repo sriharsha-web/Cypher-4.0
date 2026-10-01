@@ -10,7 +10,7 @@
 }
 
 .reg-section {
-  padding: 40px 0 100px;
+  padding: 30px 0 50px;
 }
 
 .reg-container {
@@ -398,6 +398,61 @@
 
 .reg-home-btn { width: 100%; }
 
+
+/* ── WhatsApp Group Box ── */
+.reg-whatsapp-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding: 14px 18px;
+  background: rgba(37, 211, 102, 0.06);
+  border: 1px solid rgba(37, 211, 102, 0.28);
+  border-radius: 2px;
+  text-align: left;
+}
+.reg-whatsapp-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.reg-whatsapp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #25D366;
+  font: 800 10px var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.reg-whatsapp-sub {
+  margin: 0;
+  color: rgba(245, 244, 237, 0.7);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.reg-whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  color: #05060b;
+  background: #25D366;
+  border: 1px solid #1fa752;
+  font: 700 11px var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform .15s ease, background .15s ease;
+}
+.reg-whatsapp-btn:hover {
+  background: #2ee672;
+  transform: translateY(-1px);
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .reg-form-layout {
@@ -411,8 +466,22 @@
   }
 }
 @media (max-width: 600px) {
-  .reg-main { padding-top: 90px; }
-  .reg-form-card { padding: 20px 16px; }
-  .reg-summary-card { padding: 20px 16px; }
-  .reg-member-row { grid-template-columns: 28px 1fr auto; gap: 6px; }
+  .reg-main { padding-top: 85px; padding-bottom: 40px; }
+  .reg-section { padding: 20px 0 40px; }
+  .reg-form-card { padding: 20px 14px; }
+  .reg-summary-card { padding: 20px 14px; }
+  .reg-member-row { grid-template-columns: 24px 1fr auto; gap: 8px; }
+  .reg-field input, .reg-member-input-wrap input { font-size: 16px; }
+  .reg-result-card { padding: 32px 18px; }
+  .reg-whatsapp-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+  .reg-whatsapp-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .reg-pass-card { padding: 22px 18px; }
 }

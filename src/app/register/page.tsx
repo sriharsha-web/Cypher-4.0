@@ -3,9 +3,8 @@
 import { useState, useCallback, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle, MessageSquare } from "lucide-react";
 import { Header } from "@/components/cypher/Header";
-import { Footer } from "@/components/cypher/Footer";
 import { PASSES, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE } from "@/lib/passes";
 import type { PassId, PassConfig } from "@/lib/passes";
 
@@ -415,6 +414,24 @@ function RegisterPageInner() {
                   <div className="reg-detail"><span>Amount Paid</span><strong>₹{successData.amount}</strong></div>
                   <div className="reg-detail"><span>Payment ID</span><strong className="reg-mono">{successData.paymentId}</strong></div>
                 </div>
+
+                {/* Small, unobtrusive WhatsApp group link */}
+                <div className="reg-whatsapp-card">
+                  <div className="reg-whatsapp-meta">
+                    <span className="reg-whatsapp-badge"><MessageSquare size={13} /> OFFICIAL SQUAD CHAT</span>
+                    <p className="reg-whatsapp-sub">Join the participants WhatsApp group for schedules, mentor pairing, and announcements.</p>
+                  </div>
+                  <a
+                    href="https://chat.whatsapp.com/JOgkJji72mkAQup14vUn2G?mode=gi_t"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="reg-whatsapp-btn"
+                  >
+                    <span>Join WhatsApp Group</span>
+                    <ArrowUpRight size={14} />
+                  </a>
+                </div>
+
                 <Link href="/" className="button button-acid reg-home-btn">Back to Home <ArrowUpRight size={16} /></Link>
               </div>
             </div>
@@ -437,7 +454,6 @@ function RegisterPageInner() {
         )}
 
       </main>
-      <Footer />
     </div>
   );
 }

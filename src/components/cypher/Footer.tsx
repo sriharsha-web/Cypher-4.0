@@ -53,13 +53,13 @@ export function Footer() {
         {/* COLUMN 2: QUICK LINKS & POLICIES */}
         <div>
           <p className="footer-label">Navigation</p>
-          <a href="#about">About</a>
-          <a href="#experience">Experience</a>
-          <a href="#schedule">Schedule</a>
-          <a href="#past-events">Past Events</a>
-          <a href="#sponsors">Sponsors</a>
-          <a href="#register">Access Passes</a>
-          <a href="#faq">FAQs</a>
+          <a href="/#about">About</a>
+          <a href="/#experience">Experience</a>
+          <a href="/#schedule">Schedule</a>
+          <a href="/#past-events">Past Events</a>
+          <a href="/#sponsors">Sponsors</a>
+          <a href="/#register">Access Passes</a>
+          <a href="/#faq">FAQs</a>
 
           <p className="footer-label" style={{ marginTop: "20px" }}>
             Legal &amp; Policies

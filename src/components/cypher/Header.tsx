@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 
 type HeaderProps = {
@@ -10,13 +11,13 @@ type HeaderProps = {
 };
 
 const navItems = [
-  ["About", "#about"],
-  ["Experience", "#experience"],
-  ["Schedule", "#schedule"],
-  ["Past Events", "#past-events"],
-  ["Sponsors", "#sponsors"],
-  ["Access Passes", "#register"],
-  ["FAQs", "#faq"],
+  ["About", "/#about"],
+  ["Experience", "/#experience"],
+  ["Schedule", "/#schedule"],
+  ["Past Events", "/#past-events"],
+  ["Sponsors", "/#sponsors"],
+  ["Access Passes", "/#register"],
+  ["FAQs", "/#faq"],
 ] as const;
 
 export function Header({
@@ -35,7 +36,7 @@ export function Header({
         </div>
       </div>
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="Rotaract home" onClick={onNavigate}>
+        <Link className="brand" href="/#top" aria-label="Rotaract home" onClick={onNavigate}>
           <Image
             src="/Rotaract_logo_white.png"
             alt="Rotaract Club of Atria Logo"
@@ -44,7 +45,7 @@ export function Header({
             priority
             style={{ height: "54px", width: "auto", objectFit: "contain" }}
           />
-        </a>
+        </Link>
 
         <nav
           className={menuOpen ? "main-nav is-open" : "main-nav"}
@@ -55,9 +56,9 @@ export function Header({
               {label}
             </a>
           ))}
-          <a className="nav-cta" href="#register" onClick={onNavigate}>
+          <Link className="nav-cta" href="/register" onClick={onNavigate}>
             Register Now <ArrowUpRight size={16} />
-          </a>
+          </Link>
         </nav>
 
         <button

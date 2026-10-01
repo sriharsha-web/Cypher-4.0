@@ -8,18 +8,28 @@ export function ScrollChoreography() {
   useEffect(() => {
     const root = document.documentElement;
     const statement = document.querySelector<HTMLElement>(".statement");
+    if (statement) statement.dataset.copy = statement.textContent?.trim() ?? "";
+
     const stageProgress = (element: HTMLElement | null) => {
       if (!element) return 0;
       const range = Math.max(1, element.offsetHeight - window.innerHeight);
       return clamp((window.scrollY - element.offsetTop) / range);
     };
 
-    if (statement) statement.dataset.copy = statement.textContent?.trim() ?? "";
-
     let frame = 0;
     const update = () => {
       const heroProgress = stageProgress(document.querySelector<HTMLElement>(".hero"));
-      const manifestoProgress = stageProgress(document.querySelector<HTMLElement>("#about"));
+
+      // Smooth viewport-based manifesto progress without needing 210svh empty space
+      const aboutEl = document.querySelector<HTMLElement>("#about");
+      let manifestoProgress = 0;
+      if (aboutEl) {
+        const rect = aboutEl.getBoundingClientRect();
+        const trigger = window.innerHeight * 0.75;
+        const span = window.innerHeight * 0.55;
+        manifestoProgress = clamp((trigger - rect.top) / span);
+      }
+
       const scheduleProgress = stageProgress(document.querySelector<HTMLElement>("#schedule"));
       const passProgress = stageProgress(document.querySelector<HTMLElement>("#register"));
       const finaleProgress = stageProgress(document.querySelector<HTMLElement>(".finale"));
