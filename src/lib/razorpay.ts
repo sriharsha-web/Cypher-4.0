@@ -24,5 +24,5 @@ export function verifySignature(
 export function generateRegistrationId(): string {
   const year = new Date().getFullYear();
   const random = crypto.randomBytes(3).toString("hex").toUpperCase();
-  return \`REG-\${year}-\${random}\`;
+  return `REG-${year}-${random}`;
 }
