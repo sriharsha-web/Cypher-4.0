@@ -242,6 +242,22 @@ export function BootLoader({ onComplete }: BootLoaderProps) {
         }
         .bl2-footer span:last-child { color: var(--acid, #eaff00); }
 
+        @media (max-width: 480px) {
+          .bl2-card {
+            padding: 24px 18px 20px;
+            width: min(340px, calc(100vw - 28px));
+          }
+          .bl2-title {
+            margin-bottom: 20px;
+            font-size: 2.8rem;
+          }
+          .bl2-footer {
+            flex-direction: column;
+            gap: 4px;
+            font-size: 7.5px;
+          }
+        }
+
         /* ── animations ── */
         @keyframes bl2-in {
           from { opacity: 0; transform: translateY(10px) scale(.97); }
