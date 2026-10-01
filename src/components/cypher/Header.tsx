@@ -12,13 +12,13 @@ type HeaderProps = {
 };
 
 const navItems = [
-  ["About", "/#about"],
-  ["Experience", "/#experience"],
-  ["Schedule", "/#schedule"],
-  ["Past Events", "/#past-events"],
-  ["Sponsors", "/#sponsors"],
-  ["Access Passes", "/#register"],
-  ["FAQs", "/#faq"],
+  { label: "About", id: "about", href: "/#about" },
+  { label: "Experience", id: "experience", href: "/#experience" },
+  { label: "Schedule", id: "schedule", href: "/#schedule" },
+  { label: "Past Events", id: "past-events", href: "/#past-events" },
+  { label: "Sponsors", id: "sponsors", href: "/#sponsors" },
+  { label: "Access Passes", id: "register", href: "/#register" },
+  { label: "FAQs", id: "faq", href: "/#faq" },
 ] as const;
 
 export function Header({
@@ -27,6 +27,7 @@ export function Header({
   onNavigate,
 }: HeaderProps = {}) {
   const [internalMenuOpen, setInternalMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
   const isControlled = controlledMenuOpen !== undefined;
   const menuOpen = isControlled ? controlledMenuOpen : internalMenuOpen;
 
@@ -43,6 +44,68 @@ export function Header({
       onNavigate();
     } else {
       setInternalMenuOpen(false);
+    }
+  };
+
+  // Active section scrollspy
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleScroll = () => {
+      if (window.location.pathname !== "/") {
+        setActiveSection("");
+        return;
+      }
+
+      const scrollPosition = window.scrollY + 140;
+      const ids = navItems.map((item) => item.id);
+
+      for (let i = ids.length - 1; i >= 0; i--) {
+        const id = ids[i];
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          if (scrollPosition >= top) {
+            setActiveSection(id);
+            return;
+          }
+        }
+      }
+      setActiveSection("");
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Smooth scroll handler for anchor links
+  const handleNavLinkClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+    id: string
+  ) => {
+    handleNavigate();
+
+    if (typeof window !== "undefined" && window.location.pathname === "/") {
+      const el = document.getElementById(id);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth" });
+        window.history.pushState(null, "", `#${id}`);
+        setActiveSection(id);
+      }
+    }
+  };
+
+  // Logo home click
+  const handleBrandClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    handleNavigate();
+    if (typeof window !== "undefined" && window.location.pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.history.pushState(null, "", "/");
+      setActiveSection("");
     }
   };
 
@@ -80,7 +143,7 @@ export function Header({
         </div>
       </div>
       <header className="site-header">
-        <Link className="brand" href="/#top" aria-label="Rotaract home" onClick={handleNavigate}>
+        <Link className="brand" href="/#top" aria-label="Rotaract home" onClick={handleBrandClick}>
           <Image
             src="/Rotaract_logo_white.png"
             alt="Rotaract Club of Atria Logo"
@@ -110,16 +173,24 @@ export function Header({
             </span>
           </div>
 
-          <div className="mobile-nav-links">
-            {navItems.map(([label, href]) => (
-              <a key={label} href={href} onClick={handleNavigate}>
-                <span>{label}</span>
-                <span className="mobile-nav-link-arrow">→</span>
-              </a>
-            ))}
+          <div className="nav-links-container">
+            {navItems.map(({ label, id, href }) => {
+              const isActive = activeSection === id;
+              return (
+                <a
+                  key={label}
+                  href={href}
+                  className={`nav-link ${isActive ? "is-active" : ""}`}
+                  onClick={(e) => handleNavLinkClick(e, href, id)}
+                >
+                  <span>{label}</span>
+                  <span className="mobile-nav-link-arrow">→</span>
+                </a>
+              );
+            })}
           </div>
 
-          <div className="mobile-nav-actions">
+          <div className="nav-actions-container">
             <Link className="nav-cta" href="/register" onClick={handleNavigate}>
               Register Now <ArrowUpRight size={16} />
             </Link>
