@@ -5,6 +5,8 @@ export type SponsorConfig = {
   color: string;
 };
 
+export const SPONSORSHIP_BROCHURE_PATH = "/Cypher-4.0-Sponsorship-Brochurepdf.pdf";
+
 export const sponsors: SponsorConfig[] = [
   {
     name: "Walrus",
