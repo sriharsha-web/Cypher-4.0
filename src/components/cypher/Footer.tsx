@@ -13,7 +13,7 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div className="shell footer-grid">
-        {/* COLUMN 1: BRAND & MISSION */}
+        {/* COLUMN 1: BRAND, DATES & MAP */}
         <div>
           <div className="footer-logo-block">
             <Image
@@ -37,16 +37,38 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="footer-meta-pill" style={{ marginTop: "10px" }}>
-            <span>VENUE &amp; LOCATION</span>
-            <p style={{ display: "flex", alignItems: "flex-start", gap: "6px" }}>
-              <MapPin size={14} color="var(--purple)" style={{ flexShrink: 0, marginTop: "2px" }} />
-              <span>
-                Atria Institute of Technology
-                <br />
-                ASKB Campus, Hebbal, Bengaluru, Karnataka 560024
+          {/* VENUE & LOCATION MAP */}
+          <div className="footer-map-card">
+            <div className="footer-map-header">
+              <span className="footer-map-label">
+                <MapPin size={13} color="var(--purple)" /> VENUE &amp; LOCATION
               </span>
+              <a
+                href="https://maps.app.goo.gl/eMgJZLDqt4hk2sfd7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-map-link"
+                title="Open in Google Maps"
+              >
+                Open in Maps <ArrowUpRight size={13} />
+              </a>
+            </div>
+            <p className="footer-map-address">
+              <strong>Atria Institute of Technology</strong>
+              <span>ASKB Campus, Hebbal, Bengaluru, Karnataka 560024</span>
             </p>
+            <div className="footer-map-frame-wrap">
+              <iframe
+                title="Atria Institute of Technology Location Map"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.054508316104!2d77.58954907575239!3d13.032517487288636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae17bd97727093%3A0x5135aab8250c1df5!2sAtria%20Institute%20of%20Technology!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin"
+                width="100%"
+                height="150"
+                style={{ border: 0, display: "block" }}
+                allowFullScreen={false}
+                loading="eager"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
           </div>
         </div>
 
