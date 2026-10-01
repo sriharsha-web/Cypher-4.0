@@ -10,16 +10,8 @@ export function ScrollChoreography() {
     const statement = document.querySelector<HTMLElement>(".statement");
     const stageProgress = (element: HTMLElement | null) => {
       if (!element) return 0;
-      const rect = element.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const height = rect.height || element.offsetHeight;
-      if (height > vh) {
-        const range = height - vh;
-        return clamp(-rect.top / range);
-      }
-      const total = vh + height;
-      if (total <= 0) return 0;
-      return clamp((vh - rect.top) / total);
+      const range = Math.max(1, element.offsetHeight - window.innerHeight);
+      return clamp((window.scrollY - element.offsetTop) / range);
     };
 
     if (statement) statement.dataset.copy = statement.textContent?.trim() ?? "";
