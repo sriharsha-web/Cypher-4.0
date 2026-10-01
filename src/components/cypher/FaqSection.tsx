@@ -13,7 +13,7 @@ export const faqs: FaqItem[] = [
   {
     question: "What is CYPHER 4.0?",
     answer:
-      "CYPHER 4.0 is a 24-hour space-themed hackathon organized by the Rotaract Club of Atria Institute of Technology. It brings together programmers, designers, and problem-solvers to collaborate on innovative solutions in a competitive and creative environment.",
+      "CYPHER 4.0 is an 18-hour space-themed hackathon organized by the Rotaract Club of Atria Institute of Technology. It brings together programmers, designers, and problem-solvers to collaborate on innovative solutions in a competitive and creative environment.",
   },
   {
     question: "Who can participate in the hackathon?",

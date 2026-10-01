@@ -133,7 +133,7 @@ export function ScheduleSection({
             </h2>
           </div>
           <p>
-            The official 24-hour itinerary and timeline from check-in to final prize distribution.
+            The official 18-hour itinerary and timeline from check-in to final prize distribution.
           </p>
         </div>
 

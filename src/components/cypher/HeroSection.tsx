@@ -16,7 +16,7 @@ export function HeroSection({ timeLeft }: HeroSectionProps) {
 
         <div className="hero-grid">
           <div className="hero-copy reveal">
-            <p className="mono-label">A 24-HOUR BUILD-A-THON FOR</p>
+            <p className="mono-label">AN 18-HOUR HACKATHON FOR</p>
             <h1>
               CYPHER <span>4.0</span>
             </h1>

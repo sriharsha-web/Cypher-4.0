@@ -1102,10 +1102,10 @@ h1 span, h2 span { color: var(--acid); }
 .footer-logo-block {
   display: inline-flex;
   align-items: center;
-  padding: 10px 14px;
-  background: var(--ink);
-  border: 2px solid var(--ink);
-  box-shadow: 4px 4px 0 var(--acid);
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   margin-bottom: 16px;
 }
 
