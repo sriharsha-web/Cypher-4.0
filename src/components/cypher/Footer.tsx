@@ -9,7 +9,6 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
-
 export function Footer() {
   return (
     <footer className="site-footer">
@@ -57,6 +56,8 @@ export function Footer() {
           <a href="#about">About</a>
           <a href="#experience">Experience</a>
           <a href="#schedule">Schedule</a>
+          <a href="#past-events">Past Events</a>
+          <a href="#sponsors">Sponsors</a>
           <a href="#register">Access Passes</a>
           <a href="#faq">FAQs</a>
 
@@ -72,14 +73,14 @@ export function Footer() {
         {/* COLUMN 3: CONTACT & SOCIAL */}
         <div>
           <p className="footer-label">Contact Us</p>
-          <a href="mailto:rotaractatriait3191@gmail.com" title="Send email">
-            <Mail size={14} /> rotaractatriait3191@gmail.com
+          <a href="mailto:rotaractatriait3191@gmail.com" title="Send email" style={{ wordBreak: "break-all" }}>
+            <Mail size={14} style={{ flexShrink: 0 }} /> rotaractatriait3191@gmail.com
           </a>
-          <a href="tel:+918296869390" title="Call Rahul">
-            <Phone size={14} /> +91 8296869390
+          <a href="tel:+918296869390" title="Call Contact">
+            <Phone size={14} style={{ flexShrink: 0 }} /> +91 8296869390
           </a>
           <a href="tel:+917349238222" title="Call Contact">
-            <Phone size={14} /> +91 7349238222
+            <Phone size={14} style={{ flexShrink: 0 }} /> +91 7349238222
           </a>
           <a
             href="https://rotaractait2026-27.vercel.app"
@@ -87,7 +88,7 @@ export function Footer() {
             rel="noopener noreferrer"
             title="Official Club Website"
           >
-            <Globe size={14} /> Club Website <ArrowUpRight size={12} />
+            <Globe size={14} style={{ flexShrink: 0 }} /> Club Website <ArrowUpRight size={12} />
           </a>
 
           <p className="footer-label" style={{ marginTop: "20px" }}>

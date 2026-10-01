@@ -21,7 +21,7 @@ const SHARED_BENEFITS = [
   "Meals & refreshments provided",
   "Certificate of participation",
   "Priority seating during talks",
-  "Eligibility for prizes",
+  "Awards, bounties & recognition",
 ];
 
 export const PASSES: Record<PassId, PassConfig> = {

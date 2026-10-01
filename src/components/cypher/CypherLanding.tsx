@@ -14,6 +14,7 @@ import { SponsorSection } from "./SponsorSection";
 import { RegistrationSection } from "./RegistrationSection";
 import { FaqSection } from "./FaqSection";
 import { ScheduleSection } from "./ScheduleSection";
+import { PastEventsSection } from "./PastEventsSection";
 import { tracks } from "./data";
 
 const TARGET_EVENT_DATE = new Date("2026-10-09T09:00:00+05:30").getTime();
@@ -44,23 +45,38 @@ export function CypherLanding() {
     return () => window.clearInterval(timer);
   }, []);
 
-  return <div className="site-shell">
-    <BootLoader />
-    <ParallaxStarsBackground speed={1} />
-    <ScrollChoreography />
-    <Header menuOpen={menuOpen} onMenuToggle={() => setMenuOpen((open) => !open)} onNavigate={() => setMenuOpen(false)} />
-    <main id="top">
-      <HeroSection timeLeft={timeLeft} />
-      <AboutSection />
-      <ExperienceSection />
-      <ScheduleSection activeTrack={tracks[trackIndex]} tracks={tracks} activeIndex={trackIndex} onMove={(direction) => setTrackIndex((index) => (index + direction + tracks.length) % tracks.length)} onSelect={setTrackIndex} />
-      <SponsorSection />
-      <RegistrationSection />
-      <FaqSection />
-      <FinaleSection />
-    </main>
-    <Footer />
-  </div>;
+  return (
+    <div className="site-shell">
+      <BootLoader />
+      <ParallaxStarsBackground speed={1} />
+      <ScrollChoreography />
+      <Header
+        menuOpen={menuOpen}
+        onMenuToggle={() => setMenuOpen((open) => !open)}
+        onNavigate={() => setMenuOpen(false)}
+      />
+      <main id="top">
+        <HeroSection timeLeft={timeLeft} />
+        <AboutSection />
+        <ExperienceSection />
+        <ScheduleSection
+          activeTrack={tracks[trackIndex]}
+          tracks={tracks}
+          activeIndex={trackIndex}
+          onMove={(direction) =>
+            setTrackIndex((index) => (index + direction + tracks.length) % tracks.length)
+          }
+          onSelect={setTrackIndex}
+        />
+        <PastEventsSection />
+        <SponsorSection />
+        <RegistrationSection />
+        <FaqSection />
+        <FinaleSection />
+      </main>
+      <Footer />
+    </div>
+  );
 }
 
 export default CypherLanding;

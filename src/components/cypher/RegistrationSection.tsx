@@ -10,7 +10,7 @@ const passBenefits = [
   "Meals & refreshments provided",
   "Certificate of participation",
   "Priority seating during talks",
-  "Eligibility for prizes",
+  "Awards, bounties & recognition",
 ];
 
 export function RegistrationSection() {
@@ -29,7 +29,7 @@ export function RegistrationSection() {
           <article className="pass-card">
             <h3>ATRIANS</h3>
             <div className="pass-price">
-              <strong>Rs 250/-</strong>
+              <strong>₹250/-</strong>
               <small>per person</small>
             </div>
             <p className="pass-desc">Entry-level orbital access for Atria personnel.</p>
@@ -53,7 +53,7 @@ export function RegistrationSection() {
             <span className="featured-label">FEATURED PASS</span>
             <h3>NON-ATRIANS</h3>
             <div className="pass-price">
-              <strong>Rs 290/-</strong>
+              <strong>₹290/-</strong>
               <small>per person</small>
             </div>
             <p className="pass-desc">Interstellar access for all external technical entities.</p>

@@ -26,14 +26,14 @@ export const tracks: Track[] = [
     number: "04",
     title: "Evaluation and Presentation",
     time: "10:30 AM – 01:30 PM",
-    copy: "Teams submit and present their projects to the judges.",
+    copy: "Teams submit and present their projects to the judges and technical architecture panel.",
     accent: "white",
   },
   {
     number: "05",
-    title: "Prize Distribution",
+    title: "Closing & Awards Ceremony",
     time: "01:30 PM – 04:00 PM",
-    copy: "Winners are announced, and prizes are distributed.",
+    copy: "Top performing squadrons are recognized, project showcases take the stage, and certificates and awards are presented.",
     accent: "red",
   },
 ];
