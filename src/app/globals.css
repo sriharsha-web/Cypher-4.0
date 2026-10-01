@@ -1056,7 +1056,6 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); line-height: .9; text-
    ========================================================================== */
 
 /* Prevent horizontal overflow across all screen sizes */
-/* Use overflow-x: clip on body so position: sticky is preserved */
 body {
   overflow-x: clip;
 }
@@ -1070,46 +1069,68 @@ body {
   touch-action: manipulation;
 }
 
-/* Sponsors grid layout fix for 5 items */
+/* ── Ultrawide / Large Desktop (≥ 1440px) ── */
+@media (min-width: 1440px) {
+  .shell {
+    max-width: 1320px;
+  }
+  .sponsor-section {
+    padding: 100px 0;
+  }
+}
+
+/* ── Desktop Sponsor Grid ── */
 @media (min-width: 1024px) {
   .sponsor-grid {
     grid-template-columns: repeat(5, 1fr) !important;
   }
 }
-@media (min-width: 601px) and (max-width: 1023px) {
+
+/* ── Tablet Breakpoint (≤ 1024px) ── */
+@media (max-width: 1024px) {
   .sponsor-grid {
     grid-template-columns: repeat(3, 1fr) !important;
   }
-}
-@media (max-width: 600px) {
-  .sponsor-grid {
-    grid-template-columns: 1fr !important;
+  .sponsor-section {
+    padding: 80px 0;
+  }
+  .sponsor-heading {
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    margin-bottom: 28px;
+  }
+  .sponsor-cta {
+    margin-top: 28px;
+  }
+  .sponsor-grid-wrapper {
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  /* Journey grid 3 columns on tablet */
+  .journey-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .journey-card:last-child {
+    grid-column: auto;
   }
 }
 
-/* Tablet Breakpoint (<= 1024px) */
-@media (max-width: 1024px) {
-}
-
-/* Tablet & Mobile Breakpoint (<= 900px) */
+/* ── Tablet & Mobile Breakpoint (≤ 900px) ── */
 @media (max-width: 900px) {
-  /* Release sticky choreography that traps screen on mobile */
+  /* Release sticky choreography */
   .hero {
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
-    padding: 30px 0 60px !important;
   }
   .hero-inner {
     position: relative !important;
     top: auto !important;
     min-height: auto !important;
     display: block !important;
-    padding: 0 !important;
+    padding: 60px 0 50px !important;
   }
   .hero-grid {
     grid-template-columns: 1fr !important;
-    gap: 36px !important;
+    gap: 32px !important;
   }
   .hero-copy.reveal,
   .stats-grid.reveal {
@@ -1118,11 +1139,11 @@ body {
     animation: none !important;
   }
 
-  /* About section mobile release */
+  /* About section */
   #about {
     min-height: auto !important;
     height: auto !important;
-    padding: 70px 0 !important;
+    padding: 60px 0 !important;
   }
   #about > .shell {
     position: relative !important;
@@ -1132,12 +1153,12 @@ body {
   }
   .two-column {
     grid-template-columns: 1fr !important;
-    gap: 40px !important;
+    gap: 36px !important;
   }
 
-  /* Schedule section pinned scroll transition on tablet/mobile */
+  /* Schedule section pinned scroll on tablet/mobile */
   #schedule {
-    min-height: 220svh !important;
+    min-height: 200svh !important;
     height: auto !important;
     padding: 0 !important;
     position: relative !important;
@@ -1150,9 +1171,14 @@ body {
     align-content: center !important;
   }
 
-  /* Registration section mobile release */
+  /* Experience section */
+  .section.section-grid {
+    padding: 60px 0 !important;
+  }
+
+  /* Registration section */
   .register-section {
-    padding: 70px 0 !important;
+    padding: 60px 0 0 !important;
   }
 
   /* Mobile Navigation Menu */
@@ -1226,15 +1252,74 @@ body {
     border: 2px solid var(--ink) !important;
     box-shadow: 4px 4px 0 var(--purple) !important;
   }
+
+  /* Journey grid 2 columns on tablet */
+  .journey-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .journey-card {
+    min-height: 220px !important;
+  }
+  .journey-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  /* Sponsor section spacing */
+  .sponsor-section {
+    padding: 60px 0 !important;
+  }
+  .sponsor-cell {
+    min-height: 120px !important;
+  }
+  .sponsor-cell-logo {
+    font-size: clamp(1.6rem, 4vw, 2.8rem) !important;
+  }
+  .sponsor-cell-label {
+    font-size: 9px !important;
+    padding: 3px 6px !important;
+    top: 10px !important;
+    left: 10px !important;
+  }
+
+  /* Footer 2 columns */
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px 20px !important;
+    padding: 48px 0 !important;
+  }
+  .footer-grid > div:first-child {
+    grid-column: 1 / -1;
+  }
 }
 
-/* Smartphone Breakpoint (<= 640px) */
+/* ── Landscape phone / Small tablet (641px – 900px) ── */
+@media (min-width: 641px) and (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+  }
+  .stat {
+    min-height: 90px !important;
+    padding: 14px 12px !important;
+    aspect-ratio: auto !important;
+  }
+  .passes {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .value-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+  }
+}
+
+/* ── Smartphone Breakpoint (≤ 640px) ── */
 @media (max-width: 640px) {
   .shell {
     width: min(100% - 28px, 1240px) !important;
   }
 
-  /* Typography fluid adjustments */
+  /* Typography */
   .hero h1 {
     font-size: clamp(3.2rem, 16vw, 5.5rem) !important;
     line-height: 0.95 !important;
@@ -1250,7 +1335,7 @@ body {
     margin-top: 18px !important;
   }
 
-  /* Fluid responsive countdown */
+  /* Countdown */
   .countdown {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
@@ -1270,7 +1355,7 @@ body {
     letter-spacing: 0.06em !important;
   }
 
-  /* Hero buttons full-width stack on small mobile */
+  /* Buttons stack full-width */
   .action-row {
     flex-direction: column !important;
     gap: 12px !important;
@@ -1283,7 +1368,7 @@ body {
     text-align: center !important;
   }
 
-  /* Stats 2x2 grid */
+  /* Stats 2×2 grid */
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px !important;
@@ -1298,13 +1383,13 @@ body {
     font-size: clamp(1.8rem, 6.5vw, 2.5rem) !important;
   }
 
-  /* Value grid (Experience section) */
+  /* Value grid single-column */
   .value-grid {
     grid-template-columns: 1fr !important;
     gap: 16px !important;
   }
 
-  /* Track / Schedule Card */
+  /* Track / Schedule card */
   .track-card {
     grid-template-columns: 1fr !important;
   }
@@ -1326,7 +1411,7 @@ body {
     font-size: 14px !important;
   }
 
-  /* Past events grid single-column on mobile */
+  /* Past events */
   .past-events-grid-clean {
     grid-template-columns: 1fr !important;
   }
@@ -1343,7 +1428,7 @@ body {
     justify-content: center !important;
   }
 
-  /* Passes Section */
+  /* Passes single-column */
   .passes {
     grid-template-columns: 1fr !important;
     gap: 20px !important;
@@ -1354,30 +1439,70 @@ body {
   .register-moon-wrapper {
     width: 100% !important;
     max-width: 100% !important;
-    height: 180px !important;
+    height: 160px !important;
   }
   .register-moon-img {
-    width: 360px !important;
-    height: 360px !important;
+    width: 340px !important;
+    height: 340px !important;
   }
 
-  /* Finale Section */
+  /* Sponsor grid single-column */
+  .sponsor-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .sponsor-cell {
+    min-height: 100px !important;
+    border-right: none !important;
+  }
+  .sponsor-cell:nth-child(1),
+  .sponsor-cell:nth-child(2) {
+    grid-column: auto !important;
+  }
+  .sponsor-cell:nth-child(3),
+  .sponsor-cell:nth-child(4),
+  .sponsor-cell:nth-child(5) {
+    grid-column: auto !important;
+  }
+  .sponsor-grid-wrapper {
+    box-shadow: 6px 6px 0 var(--ink) !important;
+  }
+  .sponsor-cta {
+    margin-top: 22px !important;
+    height: 52px !important;
+  }
+
+  /* Finale */
   .finale {
-    padding: 70px 0 !important;
+    padding: 60px 0 !important;
   }
   .finale h2 {
     font-size: clamp(3.2rem, 14vw, 5.5rem) !important;
   }
   .finale p {
     font-size: 16px !important;
-    margin: 20px auto 28px !important;
+    margin: 18px auto 24px !important;
   }
 
-  /* Footer on mobile */
+  /* Journey single-column */
+  .journey-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .journey-card {
+    min-height: 180px !important;
+  }
+  .journey-card:last-child {
+    grid-column: auto !important;
+  }
+
+  /* Footer single-column */
   .footer-grid {
     grid-template-columns: 1fr !important;
-    gap: 36px !important;
-    padding: 48px 0 !important;
+    gap: 32px !important;
+    padding: 40px 0 !important;
+  }
+  .footer-grid > div:first-child {
+    grid-column: auto !important;
   }
   .footer-social-btn {
     width: 44px !important;
@@ -1386,34 +1511,191 @@ body {
   .footer-bottom {
     display: flex !important;
     flex-direction: column !important;
-    gap: 14px !important;
-    padding: 20px 0 !important;
+    gap: 12px !important;
+    padding: 18px 0 !important;
   }
   .footer-policy-links {
     flex-wrap: wrap !important;
     gap: 10px !important;
   }
+
+  /* FAQ compact */
+  .faq-section {
+    padding: 50px 0 60px !important;
+  }
+  .faq-accordion-group {
+    box-shadow: 6px 6px 0 var(--ink) !important;
+  }
+
+  /* About section compact */
+  #about {
+    padding: 50px 0 !important;
+  }
+
+  /* Past events compact */
+  .past-events-section {
+    padding: 30px 0 !important;
+  }
+
+  /* Section headings block layout */
+  .section-heading {
+    display: block !important;
+  }
+  .section-heading > p {
+    margin-top: 16px !important;
+  }
+
+  /* Global h2 clamp */
+  h2 {
+    font-size: clamp(3rem, 12vw, 5rem) !important;
+  }
 }
 
-/* Extra small mobile (<= 360px) */
+/* ── Small mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .hero-inner {
+    padding: 50px 0 40px !important;
+  }
+  .hero-meta span {
+    font-size: 12px !important;
+  }
+
+  /* Section spacing tighter */
+  .section,
+  .register-section {
+    padding: 45px 0 !important;
+  }
+  .register-section {
+    padding-bottom: 0 !important;
+  }
+  #about {
+    padding: 45px 0 !important;
+  }
+  .sponsor-section {
+    padding: 45px 0 !important;
+  }
+  .past-events-section {
+    padding: 24px 0 !important;
+  }
+
+  /* Countdown items tighter */
+  .countdown-item strong {
+    min-height: 48px !important;
+    font-size: clamp(1.4rem, 4.5vw, 2rem) !important;
+  }
+
+  /* Track card text */
+  .track-card p {
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+  }
+
+  /* Passes heading */
+  .passes-heading-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  /* Sponsor CTA */
+  .sponsor-cta-label {
+    font-size: 12px !important;
+  }
+
+  /* FAQ mobile */
+  .faq-main-title {
+    font-size: clamp(3rem, 12vw, 5rem) !important;
+  }
+  .faq-contact-details {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  .faq-contact-sep {
+    display: none !important;
+  }
+  .faq-contact-link {
+    font-size: 11px !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── Extra small mobile (≤ 360px) ── */
 @media (max-width: 360px) {
   .shell {
-    width: min(100% - 20px, 1240px) !important;
+    width: min(100% - 16px, 1240px) !important;
   }
   .site-header {
-    padding: 0 12px !important;
+    padding: 0 10px !important;
   }
   .hero h1 {
-    font-size: 2.8rem !important;
+    font-size: 2.6rem !important;
   }
   .countdown {
-    gap: 6px !important;
+    gap: 5px !important;
   }
   .countdown-item strong {
-    min-height: 44px !important;
-    font-size: 1.4rem !important;
+    min-height: 42px !important;
+    font-size: 1.3rem !important;
   }
   .stat strong {
+    font-size: 1.5rem !important;
+  }
+  .stat {
+    min-height: 70px !important;
+    padding: 10px 8px !important;
+  }
+  .track-card h3 {
     font-size: 1.6rem !important;
+  }
+  .passes article {
+    padding: 20px 16px !important;
+  }
+  .pass-price strong {
+    font-size: 2.4rem !important;
+  }
+  .journey-card {
+    min-height: 160px !important;
+    padding: 16px !important;
+  }
+  .journey-card h3 {
+    font-size: 20px !important;
+  }
+  .finale h2 {
+    font-size: clamp(2.6rem, 13vw, 4.5rem) !important;
+  }
+  .sponsor-heading {
+    font-size: clamp(2.2rem, 10vw, 3.5rem) !important;
+  }
+  .faq-question {
+    padding: 14px 12px !important;
+    font-size: 14px !important;
+  }
+  .faq-dots-btn {
+    width: 46px !important;
+    min-height: 46px !important;
+  }
+  .faq-answer-inner p {
+    font-size: 13.5px !important;
+  }
+
+  /* Footer extra-small */
+  .footer-logo-block {
+    padding: 8px 10px !important;
+  }
+  .footer-meta-pill {
+    padding: 10px 12px !important;
+  }
+  .footer-bottom {
+    font-size: 9px !important;
+  }
+
+  /* Policy pages */
+  .policy-title {
+    font-size: clamp(2.2rem, 10vw, 4rem) !important;
+  }
+  .policy-section-card {
+    padding: 18px 14px !important;
   }
 }

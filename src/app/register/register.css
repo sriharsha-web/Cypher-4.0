@@ -485,3 +485,28 @@
   }
   .reg-pass-card { padding: 22px 18px; }
 }
+
+/* ── Small mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .reg-main { padding-top: 78px; }
+  .reg-section-title { font-size: clamp(1.4rem, 5vw, 1.8rem) !important; }
+  .reg-member-row { grid-template-columns: 20px 1fr auto; gap: 6px; }
+  .reg-remove-btn { width: 28px; height: 28px; }
+  .reg-add-member-btn { font-size: 10px; padding: 8px 14px; }
+  .reg-summary-title { font-size: 9px; }
+  .reg-summary-row { font-size: 11px; }
+  .reg-summary-total strong { font-size: 1.6rem; }
+  .reg-pay-btn { font-size: 13px; min-height: 48px; }
+  .reg-result-card h1 { font-size: clamp(1.5rem, 5vw, 2rem) !important; }
+  .reg-detail { font-size: 10px; flex-direction: column; gap: 2px; }
+  .reg-detail strong { text-align: left; }
+}
+
+/* ── Extra small (≤ 360px) ── */
+@media (max-width: 360px) {
+  .reg-form-card { padding: 16px 10px; }
+  .reg-summary-card { padding: 16px 10px; }
+  .reg-field label { font-size: 9px; }
+  .phone-prefix { padding: 0 10px; font-size: 12px; }
+  .reg-pass-card { padding: 18px 12px; }
+}
