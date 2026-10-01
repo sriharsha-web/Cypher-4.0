@@ -1,99 +1,78 @@
 "use client";
 
-import { Calendar, Users, Rocket, Sparkles, ArrowUpRight, Award, CheckCircle2 } from "lucide-react";
-import Link from "next/link";
+import { Calendar, Users, Rocket, Award, CheckCircle2, ArrowUpRight } from "lucide-react";
 
 interface PastEvent {
   edition: string;
   year: string;
-  tag: string;
-  status: string;
-  isCurrent?: boolean;
-  accent: "purple" | "cyan" | "acid";
+  codename: string;
+  badge: string;
+  accent: "acid" | "purple" | "cyan";
   stats: { label: string; value: string }[];
-  description: string;
+  summary: string;
   highlights: string[];
 }
 
-const pastEvents: PastEvent[] = [
+const pastEditions: PastEvent[] = [
   {
     edition: "CYPHER 1.0",
     year: "OCTOBER 2023",
-    tag: "THE GENESIS SPRINT",
-    status: "MISSION COMPLETED",
+    codename: "THE GENESIS ORBIT",
+    badge: "MISSION 01 // ARCHIVED",
     accent: "acid",
     stats: [
       { label: "Astronauts", value: "250+" },
       { label: "Squadrons", value: "60+" },
       { label: "Campuses", value: "18+" },
     ],
-    description: "The inaugural 24-hour build-a-thon uniting ambitious student developers. Squads architected decentralized protocols, hardware automation, and resilient cloud systems.",
+    summary: "The foundational 24-hour sprint that established the CYPHER legacy. Student teams architected decentralized tools, hardware prototypes, and resilient cloud systems under high intensity.",
     highlights: [
-      "Inaugural flagship hackathon by Rotaract Atria",
-      "45+ working prototypes shipped in 24 hours",
-      "Hands-on mentorship from startup founders & alumni",
+      "Inaugural flagship 24-hour build-a-thon",
+      "45+ functional prototypes shipped on stage",
+      "Mentorship from startup founders & Atria alumni",
     ],
   },
   {
     edition: "CYPHER 2.0",
     year: "OCTOBER 2024",
-    tag: "COSMIC EXPANSION",
-    status: "MISSION COMPLETED",
+    codename: "COSMIC EXPANSION",
+    badge: "MISSION 02 // ARCHIVED",
     accent: "purple",
     stats: [
       { label: "Astronauts", value: "380+" },
       { label: "Squadrons", value: "95+" },
       { label: "Mentors", value: "30+" },
     ],
-    description: "Scaled to dual engineering tracks covering Autonomous AI agents, Computer Vision, and Web3 infra. Backed by high-tier developer tooling sponsors and tech leaders.",
+    summary: "Scaled to specialized developer tracks covering Autonomous AI agents, Computer Vision, and Web3 infrastructure, backed by developer tooling partners and tech leaders.",
     highlights: [
-      "Specialized tracks: AI/ML, Decentralized Web & IoT",
-      "Direct fast-track interview opportunities for finalists",
-      "₹50,000+ worth of bounties, hardware kits & swags",
+      "Dual specialized engineering tracks",
+      "Fast-track interview pipelines for top squads",
+      "₹50,000+ worth of bounties & hardware toolkits",
     ],
   },
   {
     edition: "CYPHER 3.0",
     year: "OCTOBER 2025",
-    tag: "QUANTUM LEAP",
-    status: "MISSION COMPLETED",
+    codename: "QUANTUM LEAP",
+    badge: "MISSION 03 // ARCHIVED",
     accent: "cyan",
     stats: [
       { label: "Astronauts", value: "460+" },
       { label: "Squadrons", value: "115+" },
       { label: "Universities", value: "35+" },
     ],
-    description: "South India's premier student-led developer arena with non-stop hacking, round-the-clock architecture reviews, and high-stakes demos before industry judges.",
+    summary: "South India\'s premier student-led hackathon with non-stop hacking, round-the-clock technical architecture reviews, and high-stakes live demos evaluated by prominent industry judges.",
     highlights: [
       "35+ universities represented across Karnataka & beyond",
-      "Multiple hackathon projects transitioned into early startups",
-      "Overwhelming community feedback & record engagement",
-    ],
-  },
-  {
-    edition: "CYPHER 4.0",
-    year: "OCT 9-10, 2026",
-    tag: "THE CURRENT ORBIT",
-    status: "REGISTRATIONS LIVE",
-    isCurrent: true,
-    accent: "acid",
-    stats: [
-      { label: "Astronauts", value: "500+" },
-      { label: "Squadrons", value: "120+" },
-      { label: "Fuel Pool", value: "₹75K+" },
-    ],
-    description: "The biggest, most ambitious edition yet. 24 hours of intense engineering, elite mentorship, production-ready tracks, and recognition at Atria Institute Auditorium.",
-    highlights: [
-      "Dedicated tracks for Atrians (₹250) & Non-Atrians (₹290)",
-      "Meals, swags, certificates & round-the-clock mentorship",
-      "Direct networking with top tech innovators & sponsors",
+      "Multiple hackathon prototypes funded into early startups",
+      "Record community acclaim & high-tier sponsor backing",
     ],
   },
 ];
 
 export function PastEventsSection() {
   return (
-    <section id="past-events" className="section past-events-section">
+    <section id="past-events" className="section past-events-section" aria-label="Past Events">
       <div className="shell">
         <div className="section-heading">
           <div>
@@ -103,63 +82,77 @@ export function PastEventsSection() {
             </h2>
           </div>
           <p>
-            A proven track record of technical intensity. Explore the lineage of South India&apos;s premier 24-hour build-a-thon.
+            A battle-tested track record of technical intensity. Explore the lineage of South India&apos;s premier 24-hour build-a-thon.
           </p>
         </div>
 
-        <div className="past-events-grid">
-          {pastEvents.map((evt) => (
+        {/* 3-Column Clean Legacy Cards Grid */}
+        <div className="past-events-grid-clean">
+          {pastEditions.map((evt) => (
             <article
               key={evt.edition}
-              className={`past-event-card past-event-${evt.accent} ${evt.isCurrent ? "is-current-edition" : ""}`}
+              className={`past-card-clean past-accent-${evt.accent}`}
             >
-              <div className="past-event-header">
-                <div className="past-event-badge-row">
-                  <span className="past-event-edition">{evt.edition}</span>
-                  <span className={`past-event-status ${evt.isCurrent ? "status-live" : "status-done"}`}>
-                    {evt.status}
-                  </span>
+              <div className="past-card-top">
+                <div className="past-badge-row">
+                  <span className="past-edition-title">{evt.edition}</span>
+                  <span className="past-badge-pill">{evt.badge}</span>
                 </div>
-                <div className="past-event-tagline">
-                  <span className="past-event-year">{evt.year}</span>
-                  <span className="past-event-tag-pill">{evt.tag}</span>
+                <div className="past-codename-row">
+                  <span className="past-codename">{evt.codename}</span>
+                  <span className="past-year-pill">{evt.year}</span>
                 </div>
               </div>
 
-              <div className="past-event-stats">
+              {/* 3 Stat Badges */}
+              <div className="past-stats-clean">
                 {evt.stats.map((s) => (
-                  <div key={s.label} className="past-event-stat-box">
+                  <div key={s.label} className="past-stat-item">
                     <strong>{s.value}</strong>
-                    <span>{s.label}</span>
+                    <small>{s.label}</small>
                   </div>
                 ))}
               </div>
 
-              <p className="past-event-desc">{evt.description}</p>
+              <p className="past-summary-text">{evt.summary}</p>
 
-              <div className="past-event-highlights">
-                <span className="past-event-hl-title">MISSION HIGHLIGHTS:</span>
+              <div className="past-hl-list">
+                <span className="past-hl-heading">KEY MILESTONES:</span>
                 <ul>
                   {evt.highlights.map((hl, i) => (
                     <li key={i}>
-                      <CheckCircle2 size={14} className="past-event-check" />
+                      <CheckCircle2 size={13} className="past-hl-check" />
                       <span>{hl}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {evt.isCurrent ? (
-                <a href="#register" className="button button-acid past-event-action-btn">
-                  Register For 4.0 <ArrowUpRight size={16} />
-                </a>
-              ) : (
-                <div className="past-event-archive-flag">
-                  <span>✦ ARCHIVED SPRINT</span>
-                </div>
-              )}
+              <div className="past-card-footer">
+                <span className="past-archived-stamp">✦ SPRINT ARCHIVED</span>
+              </div>
             </article>
           ))}
+        </div>
+
+        {/* High-Voltage Banner for CYPHER 4.0 */}
+        <div className="cypher4-banner">
+          <div className="cypher4-banner-content">
+            <div className="cypher4-banner-tag">
+              <span className="pulse-dot" />
+              <span>CURRENT MISSION: CYPHER 4.0</span>
+            </div>
+            <h3>READY TO WRITE THE NEXT CHAPTER?</h3>
+            <p>
+              Join 500+ builders, innovators, and squads at Atria Institute Auditorium on October 9–10, 2026.
+              ₹75,000+ prize pool, elite mentorship, and round-the-clock fuel.
+            </p>
+          </div>
+          <div className="cypher4-banner-action">
+            <a href="#register" className="button button-acid cypher4-banner-btn">
+              Register For 4.0 <ArrowUpRight size={18} />
+            </a>
+          </div>
         </div>
       </div>
     </section>
