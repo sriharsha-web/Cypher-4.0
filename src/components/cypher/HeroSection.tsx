@@ -1,13 +1,13 @@
 "use client";
 
-import { ChevronDown, Rocket, ArrowUpRight } from "lucide-react";
+import { ChevronDown, ArrowUpRight } from "lucide-react";
+import { CypherKeyboardVisual } from "./CypherKeyboardVisual";
 
 type HeroSectionProps = { timeLeft: Record<string, number> };
 
 export function HeroSection({ timeLeft }: HeroSectionProps) {
   return (
     <section className="hero section-grid">
-      <div className="planet planet-earth" aria-hidden="true" />
       <div className="hero-inner shell">
         <div className="eyebrow">
           <span>✦ Rotaract Club of Atria Institute of Technology</span>
@@ -52,18 +52,8 @@ export function HeroSection({ timeLeft }: HeroSectionProps) {
             </div>
           </div>
 
-          <div className="stats-grid reveal reveal-delay">
-            {[
-              ["500+", "Astronauts", "stat-acid"],
-              ["120+", "Squadrons", "stat-purple"],
-              ["24", "Light Hours", "stat-white"],
-              ["₹75K+", "Fuel Pool", "stat-cyan"],
-            ].map(([value, label, style]) => (
-              <div className={`stat ${style}`} key={label}>
-                <strong>{value}</strong>
-                <span>{label}</span>
-              </div>
-            ))}
+          <div className="hero-visual-col reveal reveal-delay">
+            <CypherKeyboardVisual />
           </div>
         </div>
       </div>
