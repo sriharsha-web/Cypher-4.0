@@ -2,6 +2,7 @@
 
 import { ArrowUpRight, Check, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { PASSES } from "@/lib/passes";
 
 const passBenefits = [
   "Team of up to 4 members",
@@ -29,7 +30,7 @@ export function RegistrationSection() {
           <article className="pass-card">
             <h3>ATRIANS</h3>
             <div className="pass-price">
-              <strong>₹250/-</strong>
+              <strong>₹{PASSES.atrians.perPerson}/-</strong>
               <small>per person</small>
             </div>
             <p className="pass-desc">Entry-level orbital access for Atria personnel.</p>
@@ -53,7 +54,7 @@ export function RegistrationSection() {
             <span className="featured-label">FEATURED PASS</span>
             <h3>NON-ATRIANS</h3>
             <div className="pass-price">
-              <strong>₹290/-</strong>
+              <strong>₹{PASSES["non-atrians"].perPerson}/-</strong>
               <small>per person</small>
             </div>
             <p className="pass-desc">Interstellar access for all external technical entities.</p>
