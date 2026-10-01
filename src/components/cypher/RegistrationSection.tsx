@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Check, Sparkles, AlertCircle } from "lucide-react";
+import { ArrowUpRight, Check, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { PASSES, EARLY_BIRD_LIMIT } from "@/lib/passes";
+import { PASSES } from "@/lib/passes";
+import type { PassConfig, PassId, SlabId } from "@/lib/passes";
 
 interface RegistrationStatus {
-  limit: number;
-  registeredCount: number;
-  remainingSpots: number;
-  isSoldOut: boolean;
+  slab: SlabId;
+  label: string;
+  badgeText: string;
+  passes: Record<PassId, PassConfig>;
 }
 
 const passBenefits = [
@@ -32,8 +33,8 @@ export function RegistrationSection() {
       .catch((err) => console.error("Could not fetch registration status:", err));
   }, []);
 
-  const isSoldOut = status?.isSoldOut ?? false;
-  const remaining = status ? status.remainingSpots : EARLY_BIRD_LIMIT;
+  const passes = status?.passes ?? PASSES;
+  const badgeText = status?.badgeText ?? "EARLY BIRD PRICES";
 
   return (
     <section id="register" className="register-section">
@@ -41,22 +42,16 @@ export function RegistrationSection() {
         <p className="mono-label">07 / FUEL STATUS</p>
         <div className="passes-heading-row">
           <h2>ACCESS PASSES</h2>
-          {isSoldOut ? (
-            <span className="early-bird-badge early-bird-sold-out">
-              <AlertCircle size={13} /> EARLY BIRD SOLD OUT ({status?.limit ?? 5}/{status?.limit ?? 5} TEAMS FILLED)
-            </span>
-          ) : (
-            <span className="early-bird-badge">
-              <Sparkles size={13} /> EARLY BIRD • {status ? `${remaining} / ${status.limit} TEAMS REMAINING` : `LIMITED TO FIRST ${EARLY_BIRD_LIMIT} TEAMS`}
-            </span>
-          )}
+          <span className="early-bird-badge">
+            <Sparkles size={13} /> {badgeText}
+          </span>
         </div>
 
         <div className="passes">
           <article className="pass-card">
             <h3>ATRIANS</h3>
             <div className="pass-price">
-              <strong>₹{PASSES.atrians.perPerson}/-</strong>
+              <strong>₹{passes.atrians.perPerson}/-</strong>
               <small>per person</small>
             </div>
             <p className="pass-desc">Entry-level orbital access for Atria personnel.</p>
@@ -68,25 +63,19 @@ export function RegistrationSection() {
                 </li>
               ))}
             </ul>
-            {isSoldOut ? (
-              <button className="button button-outline pass-btn pass-btn-disabled" disabled>
-                Early Bird Full
-              </button>
-            ) : (
-              <Link
-                href="/register?pass=atrians"
-                className="button button-outline pass-btn"
-              >
-                Register Now <ArrowUpRight size={16} />
-              </Link>
-            )}
+            <Link
+              href="/register?pass=atrians"
+              className="button button-outline pass-btn"
+            >
+              Register Now <ArrowUpRight size={16} />
+            </Link>
           </article>
 
           <article className="pass-card featured-pass">
             <span className="featured-label">FEATURED PASS</span>
             <h3>NON-ATRIANS</h3>
             <div className="pass-price">
-              <strong>₹{PASSES["non-atrians"].perPerson}/-</strong>
+              <strong>₹{passes["non-atrians"].perPerson}/-</strong>
               <small>per person</small>
             </div>
             <p className="pass-desc">Interstellar access for all external technical entities.</p>
@@ -98,18 +87,12 @@ export function RegistrationSection() {
                 </li>
               ))}
             </ul>
-            {isSoldOut ? (
-              <button className="button button-acid pass-btn pass-btn-disabled" disabled>
-                Early Bird Full
-              </button>
-            ) : (
-              <Link
-                href="/register?pass=non-atrians"
-                className="button button-acid pass-btn"
-              >
-                Register Now <ArrowUpRight size={16} />
-              </Link>
-            )}
+            <Link
+              href="/register?pass=non-atrians"
+              className="button button-acid pass-btn"
+            >
+              Register Now <ArrowUpRight size={16} />
+            </Link>
           </article>
         </div>
       </div>

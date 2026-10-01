@@ -1,9 +1,10 @@
 /**
- * Centralized pass & pricing configuration.
- * Change the six price values below without touching any UI or API logic.
+ * Centralized pass & pricing configuration supporting pricing tiers/slabs.
+ * Early Bird is active for the first 5 teams; after 5 completions, it switches to Slab 1 (+₹20/person).
  */
 
 export type PassId = "atrians" | "non-atrians";
+export type SlabId = "early-bird" | "slab-1";
 
 export interface PassConfig {
   id: PassId;
@@ -15,6 +16,13 @@ export interface PassConfig {
   pricing: Record<2 | 3 | 4, number>;
 }
 
+export interface SlabConfig {
+  id: SlabId;
+  label: string;
+  badgeText: string;
+  passes: Record<PassId, PassConfig>;
+}
+
 const SHARED_BENEFITS = [
   "Access to mentors & workshops",
   "Swag kit included",
@@ -24,41 +32,89 @@ const SHARED_BENEFITS = [
   "Awards, bounties & recognition",
 ];
 
-export const PASSES: Record<PassId, PassConfig> = {
-  atrians: {
-    id: "atrians",
-    name: "ATRIANS",
-    description: "Entry-level orbital access for Atria personnel.",
-    perPerson: 260,
-    featured: false,
-    benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
-    pricing: {
-      2: 520,
-      3: 780,
-      4: 1040,
+export const SLABS: Record<SlabId, SlabConfig> = {
+  "early-bird": {
+    id: "early-bird",
+    label: "Early Bird",
+    badgeText: "EARLY BIRD PRICES",
+    passes: {
+      atrians: {
+        id: "atrians",
+        name: "ATRIANS",
+        description: "Entry-level orbital access for Atria personnel.",
+        perPerson: 260,
+        featured: false,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 520,
+          3: 780,
+          4: 1040,
+        },
+      },
+      "non-atrians": {
+        id: "non-atrians",
+        name: "NON-ATRIANS",
+        description: "Interstellar access for all external technical entities.",
+        perPerson: 280,
+        featured: true,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 560,
+          3: 840,
+          4: 1120,
+        },
+      },
     },
   },
-  "non-atrians": {
-    id: "non-atrians",
-    name: "NON-ATRIANS",
-    description: "Interstellar access for all external technical entities.",
-    perPerson: 280,
-    featured: true,
-    benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
-    pricing: {
-      2: 560,
-      3: 840,
-      4: 1120,
+  "slab-1": {
+    id: "slab-1",
+    label: "Slab 1",
+    badgeText: "SLAB 1 PRICES",
+    passes: {
+      atrians: {
+        id: "atrians",
+        name: "ATRIANS",
+        description: "Entry-level orbital access for Atria personnel.",
+        perPerson: 280,
+        featured: false,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 560,
+          3: 840,
+          4: 1120,
+        },
+      },
+      "non-atrians": {
+        id: "non-atrians",
+        name: "NON-ATRIANS",
+        description: "Interstellar access for all external technical entities.",
+        perPerson: 300,
+        featured: true,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 600,
+          3: 900,
+          4: 1200,
+        },
+      },
     },
   },
 };
 
-export function getPass(id: string): PassConfig | undefined {
-  return PASSES[id as PassId];
+/** Default passes (Early Bird) */
+export const PASSES: Record<PassId, PassConfig> = SLABS["early-bird"].passes;
+
+export function getPassesForSlab(slabId: SlabId = "early-bird"): Record<PassId, PassConfig> {
+  return SLABS[slabId]?.passes ?? SLABS["early-bird"].passes;
 }
 
-export function getPrice(passId: string, teamSize: number): number | undefined {
-  const pass = getPass(passId);
+export function getPass(id: string, slabId: SlabId = "early-bird"): PassConfig | undefined {
+  const passes = getPassesForSlab(slabId);
+  return passes[id as PassId];
+}
+
+export function getPrice(passId: string, teamSize: number, slabId: SlabId = "early-bird"): number | undefined {
+  const pass = getPass(passId, slabId);
   if (!pass) return undefined;
   if (teamSize < 2 || teamSize > 4) return undefined;
   return pass.pricing[teamSize as 2 | 3 | 4];

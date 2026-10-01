@@ -8,17 +8,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { passId, teamName, teamLeaderName, contactNumber, email, collegeName, members } = body;
 
-    const pass = getPass(passId);
+    const registeredCount = await getRegisteredTeamsCount();
+    const slab = registeredCount >= EARLY_BIRD_LIMIT ? "slab-1" : "early-bird";
+
+    const pass = getPass(passId, slab);
     if (!pass) {
       return NextResponse.json({ error: "Invalid pass selected." }, { status: 400 });
-    }
-
-    const registeredCount = await getRegisteredTeamsCount();
-    if (registeredCount >= EARLY_BIRD_LIMIT) {
-      return NextResponse.json(
-        { error: "Early Bird registrations are sold out! The limit of 5 teams across both passes has been reached." },
-        { status: 400 }
-      );
     }
 
     if (!teamName?.trim()) return NextResponse.json({ error: "Team name is required." }, { status: 400 });
@@ -44,7 +39,7 @@ export async function POST(req: NextRequest) {
       if (!m?.trim()) return NextResponse.json({ error: "All team member names are required." }, { status: 400 });
     }
 
-    const amount = getPrice(passId, members.length);
+    const amount = getPrice(passId, members.length, slab);
     if (!amount) {
       return NextResponse.json({ error: "Unable to calculate price." }, { status: 400 });
     }
@@ -61,6 +56,7 @@ export async function POST(req: NextRequest) {
         teamName,
         teamSize: String(members.length),
         registrationId,
+        slab,
       },
     });
 
