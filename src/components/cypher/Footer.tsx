@@ -17,17 +17,17 @@ export function Footer() {
         <div>
           <div className="footer-logo-block">
             <Image
-              src="/Rotaract Logo_black.png"
+              src="/Rotaract_logo_white.png"
               alt="Rotaract Club of Atria Logo"
-              width={340}
-              height={100}
-              style={{ height: "80px", width: "auto", objectFit: "contain" }}
+              width={200}
+              height={60}
+              style={{ height: "48px", width: "auto", objectFit: "contain" }}
             />
           </div>
           <p style={{ marginTop: "8px", fontWeight: 600 }}>
             Rotaract Club of Atria Institute of Technology.
             <br />
-            Building technical excellence through intensive 18-hour sprints, innovation, and community collaboration.
+            Building technical excellence through intensive 24-hour sprints, innovation, and community collaboration.
           </p>
 
           <div className="footer-meta-pill">
@@ -155,17 +155,6 @@ export function Footer() {
                 <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.21a1.64 1.64 0 0 0-1.64 1.64c0 .9.74 1.64 1.64 1.64a1.64 1.64 0 0 0 1.64-1.64c0-.9-.74-1.64-1.64-1.64z" />
               </svg>
             </a>
-          </div>
-
-          {/* CYPHER 4.0 BADGE */}
-          <div className="footer-badge-block" style={{ marginTop: "24px" }}>
-            <Image
-              src="/CYPHER_4.0_badge.png"
-              alt="CYPHER 4.0 Badge"
-              width={160}
-              height={160}
-              style={{ width: "125px", height: "auto", objectFit: "contain" }}
-            />
           </div>
         </div>
       </div>

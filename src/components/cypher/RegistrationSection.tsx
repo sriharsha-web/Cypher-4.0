@@ -1,8 +1,16 @@
 "use client";
 
-import { ArrowUpRight, Check, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowUpRight, Check, Sparkles, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { PASSES } from "@/lib/passes";
+import { PASSES, EARLY_BIRD_LIMIT } from "@/lib/passes";
+
+interface RegistrationStatus {
+  limit: number;
+  registeredCount: number;
+  remainingSpots: number;
+  isSoldOut: boolean;
+}
 
 const passBenefits = [
   "Team of up to 4 members",
@@ -15,15 +23,33 @@ const passBenefits = [
 ];
 
 export function RegistrationSection() {
+  const [status, setStatus] = useState<RegistrationStatus | null>(null);
+
+  useEffect(() => {
+    fetch("/api/registration/status")
+      .then((r) => r.json())
+      .then((data) => setStatus(data))
+      .catch((err) => console.error("Could not fetch registration status:", err));
+  }, []);
+
+  const isSoldOut = status?.isSoldOut ?? false;
+  const remaining = status ? status.remainingSpots : EARLY_BIRD_LIMIT;
+
   return (
     <section id="register" className="register-section">
       <div className="shell register-content">
         <p className="mono-label">07 / FUEL STATUS</p>
         <div className="passes-heading-row">
           <h2>ACCESS PASSES</h2>
-          <span className="early-bird-badge">
-            <Sparkles size={13} /> EARLY BIRD PRICES
-          </span>
+          {isSoldOut ? (
+            <span className="early-bird-badge early-bird-sold-out">
+              <AlertCircle size={13} /> EARLY BIRD SOLD OUT ({status?.limit ?? 5}/{status?.limit ?? 5} TEAMS FILLED)
+            </span>
+          ) : (
+            <span className="early-bird-badge">
+              <Sparkles size={13} /> EARLY BIRD • {status ? `${remaining} / ${status.limit} TEAMS REMAINING` : `LIMITED TO FIRST ${EARLY_BIRD_LIMIT} TEAMS`}
+            </span>
+          )}
         </div>
 
         <div className="passes">
@@ -42,12 +68,18 @@ export function RegistrationSection() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/register?pass=atrians"
-              className="button button-outline pass-btn"
-            >
-              Register Now <ArrowUpRight size={16} />
-            </Link>
+            {isSoldOut ? (
+              <button className="button button-outline pass-btn pass-btn-disabled" disabled>
+                Early Bird Full
+              </button>
+            ) : (
+              <Link
+                href="/register?pass=atrians"
+                className="button button-outline pass-btn"
+              >
+                Register Now <ArrowUpRight size={16} />
+              </Link>
+            )}
           </article>
 
           <article className="pass-card featured-pass">
@@ -66,12 +98,18 @@ export function RegistrationSection() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/register?pass=non-atrians"
-              className="button button-acid pass-btn"
-            >
-              Register Now <ArrowUpRight size={16} />
-            </Link>
+            {isSoldOut ? (
+              <button className="button button-acid pass-btn pass-btn-disabled" disabled>
+                Early Bird Full
+              </button>
+            ) : (
+              <Link
+                href="/register?pass=non-atrians"
+                className="button button-acid pass-btn"
+              >
+                Register Now <ArrowUpRight size={16} />
+              </Link>
+            )}
           </article>
         </div>
       </div>

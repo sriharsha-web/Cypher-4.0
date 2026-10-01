@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPass, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE } from "@/lib/passes";
+import { getPass, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE, EARLY_BIRD_LIMIT } from "@/lib/passes";
 import { getRazorpayInstance, generateRegistrationId } from "@/lib/razorpay";
-import { appendRegistration } from "@/lib/sheets";
+import { appendRegistration, getRegisteredTeamsCount } from "@/lib/sheets";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,6 +11,14 @@ export async function POST(req: NextRequest) {
     const pass = getPass(passId);
     if (!pass) {
       return NextResponse.json({ error: "Invalid pass selected." }, { status: 400 });
+    }
+
+    const registeredCount = await getRegisteredTeamsCount();
+    if (registeredCount >= EARLY_BIRD_LIMIT) {
+      return NextResponse.json(
+        { error: "Early Bird registrations are sold out! The limit of 5 teams across both passes has been reached." },
+        { status: 400 }
+      );
     }
 
     if (!teamName?.trim()) return NextResponse.json({ error: "Team name is required." }, { status: 400 });

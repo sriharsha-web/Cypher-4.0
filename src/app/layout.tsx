@@ -20,7 +20,7 @@ const martianMono = Martian_Mono({
 
 export const metadata: Metadata = {
   title: "CYPHER 4.0 | Rotaract Club of Atria",
-  description: "An 18-hour hackathon for ambitious student engineers.",
+  description: "A 24-hour build-a-thon for ambitious student engineers.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

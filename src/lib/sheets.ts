@@ -113,9 +113,76 @@ export async function updatePaymentStatus(
           values: [[paymentStatus, razorpayOrderId, razorpayPaymentId, razorpaySignature, registrationStatus]],
         },
       });
+      invalidateRegistrationCountCache();
       return; // Found and updated
     } catch (err) {
       console.error(`Error searching tab ${tab}:`, err);
     }
+  }
+}
+
+let cachedTeamCount: number | null = null;
+let lastCacheTimestamp = 0;
+const CACHE_TTL_MS = 15_000; // 15 seconds
+
+export function invalidateRegistrationCountCache() {
+  cachedTeamCount = null;
+  lastCacheTimestamp = 0;
+}
+
+/**
+ * Counts total confirmed/paid teams across both Atrians and Non-atrians tabs.
+ */
+export async function getRegisteredTeamsCount(forceRefresh = false): Promise<number> {
+  const now = Date.now();
+  if (!forceRefresh && cachedTeamCount !== null && (now - lastCacheTimestamp) < CACHE_TTL_MS) {
+    return cachedTeamCount;
+  }
+
+  // Support environment variable override for manual control / testing
+  if (process.env.EARLY_BIRD_COUNT_OVERRIDE !== undefined) {
+    const override = parseInt(process.env.EARLY_BIRD_COUNT_OVERRIDE, 10);
+    if (!isNaN(override)) {
+      cachedTeamCount = override;
+      lastCacheTimestamp = now;
+      return override;
+    }
+  }
+
+  if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY || !process.env.GOOGLE_SHEETS_ID) {
+    return 0;
+  }
+
+  try {
+    const sheets = getSheets();
+    let totalCount = 0;
+
+    for (const tab of ["Atrians", "Non-atrians"]) {
+      try {
+        const response = await sheets.spreadsheets.values.get({
+          spreadsheetId: SHEET_ID,
+          range: `${tab}!A2:T`,
+        });
+
+        const rows = response.data.values || [];
+        for (const row of rows) {
+          // Col P (index 15) is paymentStatus, Col T (index 19) is registrationStatus
+          const paymentStatus = (row[15] || "").toString().trim().toUpperCase();
+          const registrationStatus = (row[19] || "").toString().trim().toUpperCase();
+          if (paymentStatus === "PAID" || registrationStatus === "CONFIRMED") {
+            totalCount++;
+          }
+        }
+      } catch (tabErr) {
+        console.error(`Error reading tab ${tab} for team count:`, tabErr);
+      }
+    }
+
+    cachedTeamCount = totalCount;
+    lastCacheTimestamp = now;
+    return totalCount;
+  } catch (err) {
+    console.error("Error calculating registered teams count:", err);
+    return cachedTeamCount ?? 0;
   }
 }

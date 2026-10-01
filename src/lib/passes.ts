@@ -66,3 +66,4 @@ export function getPrice(passId: string, teamSize: number): number | undefined {
 
 export const MIN_TEAM_SIZE = 2;
 export const MAX_TEAM_SIZE = 4;
+export const EARLY_BIRD_LIMIT = 5;

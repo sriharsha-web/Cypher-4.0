@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle, MessageSquare } from "lucide-react";
 import { Header } from "@/components/cypher/Header";
-import { PASSES, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE } from "@/lib/passes";
+import { PASSES, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE, EARLY_BIRD_LIMIT } from "@/lib/passes";
 import type { PassId, PassConfig } from "@/lib/passes";
 
 /* ─── Razorpay type ─── */
@@ -73,7 +73,21 @@ function RegisterPageInner() {
   const [successData, setSuccessData] = useState<SuccessData | null>(null);
   const [orderCache, setOrderCache] = useState<{ orderId: string; registrationId: string } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [regStatus, setRegStatus] = useState<{
+    limit: number;
+    registeredCount: number;
+    remainingSpots: number;
+    isSoldOut: boolean;
+  } | null>(null);
   const searchParams = useSearchParams();
+
+  /* ── Fetch registration status ── */
+  useEffect(() => {
+    fetch("/api/registration/status")
+      .then(r => r.json())
+      .then(data => setRegStatus(data))
+      .catch(err => console.error("Error fetching reg status:", err));
+  }, []);
 
   /* ── Auto-select pass from URL ── */
   useEffect(() => {
@@ -166,7 +180,12 @@ function RegisterPageInner() {
           }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to create order.");
+        if (!res.ok) {
+          if (data.error && data.error.toLowerCase().includes("sold out")) {
+            setRegStatus(prev => prev ? { ...prev, isSoldOut: true, remainingSpots: 0 } : null);
+          }
+          throw new Error(data.error || "Failed to create order.");
+        }
         orderId = data.orderId;
         registrationId = data.registrationId;
         setOrderCache({ orderId: orderId!, registrationId: registrationId! });
@@ -266,8 +285,27 @@ function RegisterPageInner() {
               <p className="mono-label">REGISTRATION / SELECT PASS</p>
               <div className="reg-heading-row">
                 <h1>SELECT YOUR PASS</h1>
-                <span className="early-bird-badge"><Sparkles size={13} /> EARLY BIRD PRICES</span>
+                {regStatus?.isSoldOut ? (
+                  <span className="early-bird-badge early-bird-sold-out">
+                    <AlertCircle size={13} /> EARLY BIRD SOLD OUT ({regStatus.limit}/{regStatus.limit} TEAMS FILLED)
+                  </span>
+                ) : (
+                  <span className="early-bird-badge">
+                    <Sparkles size={13} /> EARLY BIRD • {regStatus ? `${regStatus.remainingSpots} / ${regStatus.limit} TEAMS REMAINING` : `LIMITED TO FIRST ${EARLY_BIRD_LIMIT} TEAMS`}
+                  </span>
+                )}
               </div>
+
+              {regStatus?.isSoldOut && (
+                <div className="reg-sold-out-banner">
+                  <AlertCircle size={20} />
+                  <div>
+                    <strong>Early Bird Registrations are Sold Out</strong>
+                    <p>All {regStatus.limit} early bird team slots across both passes have been claimed. Regular registration will open shortly.</p>
+                  </div>
+                </div>
+              )}
+
               <div className="reg-passes">
                 {Object.values(PASSES).map((p) => (
                   <article key={p.id} className={`reg-pass-card${p.featured ? " featured-pass" : ""}`}>
@@ -278,9 +316,15 @@ function RegisterPageInner() {
                     <ul className="pass-benefits">
                       {p.benefits.map((b, i) => <li key={i}><Check size={15} /><span>{b}</span></li>)}
                     </ul>
-                    <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn`} onClick={() => selectPass(p.id)}>
-                      Register Now <ArrowUpRight size={16} />
-                    </button>
+                    {regStatus?.isSoldOut ? (
+                      <button className="button button-outline pass-btn pass-btn-disabled" disabled>
+                        Early Bird Full
+                      </button>
+                    ) : (
+                      <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn`} onClick={() => selectPass(p.id)}>
+                        Register Now <ArrowUpRight size={16} />
+                      </button>
+                    )}
                   </article>
                 ))}
               </div>
@@ -295,6 +339,16 @@ function RegisterPageInner() {
               <button className="reg-back-link" onClick={() => { setStep("select"); setOrderCache(null); }}><ArrowLeft size={14} /> Change Pass</button>
               <p className="mono-label">REGISTRATION / {pass.name}</p>
               <h1>REGISTER YOUR TEAM</h1>
+
+              {regStatus?.isSoldOut && (
+                <div className="reg-sold-out-banner">
+                  <AlertCircle size={20} />
+                  <div>
+                    <strong>Early Bird Registrations are Sold Out</strong>
+                    <p>All {regStatus.limit} early bird team slots across both passes have been claimed. Registrations are currently closed.</p>
+                  </div>
+                </div>
+              )}
 
               <div className="reg-form-layout">
                 {/* Form */}
@@ -389,9 +443,15 @@ function RegisterPageInner() {
                     <div className="reg-server-error"><AlertCircle size={14} /> {serverError}</div>
                   )}
 
-                  <button className="button button-acid reg-pay-btn" onClick={handleSubmit} disabled={submitting}>
-                    {submitting ? <><Loader2 size={16} className="spin" /> Processing...</> : <>Proceed to Payment <ArrowUpRight size={16} /></>}
-                  </button>
+                  {regStatus?.isSoldOut ? (
+                    <button className="button button-outline reg-pay-btn pass-btn-disabled" disabled>
+                      Early Bird Sold Out
+                    </button>
+                  ) : (
+                    <button className="button button-acid reg-pay-btn" onClick={handleSubmit} disabled={submitting}>
+                      {submitting ? <><Loader2 size={16} className="spin" /> Processing...</> : <>Proceed to Payment <ArrowUpRight size={16} /></>}
+                    </button>
+                  )}
                 </aside>
               </div>
             </div>

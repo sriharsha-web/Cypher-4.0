@@ -7,7 +7,7 @@ export function AboutSection() {
         <div className="reveal">
           <p className="mono-label cyan-text">MISSION LOG: 03 / ENTRY</p>
           <h2 className="about-heading">WHAT IS CYPHER <span>4.0</span></h2>
-          <p className="statement">CYPHER is the flagship 18-hour hackathon organized by the Rotaract Club of Atria. We strip away the slide decks and focus on pure engineering.</p>
+          <p className="statement">CYPHER is the flagship 24-hour build-a-thon organized by the Rotaract Club of Atria. We strip away the slide decks and focus on pure engineering.</p>
           <div className="protocol">
             <h3>PEAKS AND PERKS 4.0</h3>
             <p>Direct mentorship from the architects shaping what comes next. Internship opportunities and exclusive fast-track perks for top performing squads.</p>

@@ -1102,10 +1102,10 @@ h1 span, h2 span { color: var(--acid); }
 .footer-logo-block {
   display: inline-flex;
   align-items: center;
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+  padding: 10px 14px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--acid);
   margin-bottom: 16px;
 }
 
@@ -2287,4 +2287,19 @@ main[id] {
   .sponsor-heading {
     font-size: 2.2rem !important;
   }
+}
+
+/* Early Bird Sold Out & Pass Disabled States */
+.early-bird-badge.early-bird-sold-out {
+  background: #ff4757 !important;
+  color: #ffffff !important;
+  border-color: var(--ink) !important;
+  box-shadow: 4px 4px 0 var(--ink) !important;
+}
+
+.pass-btn.pass-btn-disabled,
+.pass-btn-disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
 }

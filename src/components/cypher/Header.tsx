@@ -147,10 +147,10 @@ export function Header({
           <Image
             src="/Rotaract_logo_white.png"
             alt="Rotaract Club of Atria Logo"
-            width={260}
-            height={80}
+            width={220}
+            height={70}
             priority
-            style={{ height: "54px", width: "auto", objectFit: "contain" }}
+            style={{ height: "46px", width: "auto", objectFit: "contain" }}
           />
         </Link>
 

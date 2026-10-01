@@ -510,3 +510,52 @@
   .phone-prefix { padding: 0 10px; font-size: 12px; }
   .reg-pass-card { padding: 18px 12px; }
 }
+
+/* ── Sold out & limit states ── */
+.early-bird-badge.early-bird-sold-out {
+  background: #ff4757 !important;
+  color: #ffffff !important;
+  border-color: var(--ink) !important;
+  box-shadow: 4px 4px 0 var(--ink) !important;
+}
+
+.pass-btn.pass-btn-disabled,
+.pass-btn-disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.reg-sold-out-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  background: rgba(255, 71, 87, 0.12);
+  border: 2px solid #ff4757;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.6);
+  color: var(--white);
+}
+
+.reg-sold-out-banner svg {
+  color: #ff4757;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.reg-sold-out-banner strong {
+  display: block;
+  font: 700 13px var(--font-mono);
+  letter-spacing: 0.05em;
+  color: #ff4757;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.reg-sold-out-banner p {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(245, 244, 237, 0.85);
+  line-height: 1.45;
+}
