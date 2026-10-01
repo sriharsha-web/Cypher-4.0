@@ -1,4 +1,7 @@
+"use client";
+
 import { ArrowUpRight, Check, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 const passBenefits = [
   "Team of up to 4 members",
@@ -38,12 +41,12 @@ export function RegistrationSection() {
                 </li>
               ))}
             </ul>
-            <a
-              href="mailto:hello@cypher.tech?subject=CYPHER%204.0%20-%20Atrians%20Pass%20Registration"
+            <Link
+              href="/register?pass=atrians"
               className="button button-outline pass-btn"
             >
               Register Now <ArrowUpRight size={16} />
-            </a>
+            </Link>
           </article>
 
           <article className="pass-card featured-pass">
@@ -62,12 +65,12 @@ export function RegistrationSection() {
                 </li>
               ))}
             </ul>
-            <a
-              href="mailto:hello@cypher.tech?subject=CYPHER%204.0%20-%20Non-Atrians%20Pass%20Registration"
+            <Link
+              href="/register?pass=non-atrians"
               className="button button-acid pass-btn"
             >
               Register Now <ArrowUpRight size={16} />
-            </a>
+            </Link>
           </article>
         </div>
       </div>
