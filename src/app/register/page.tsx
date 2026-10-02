@@ -3,10 +3,10 @@
 import { useState, useCallback, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle, MessageSquare } from "lucide-react";
+import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle, MessageSquare, GraduationCap, Globe } from "lucide-react";
 import { Header } from "@/components/cypher/Header";
-import { PASSES, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE } from "@/lib/passes";
-import type { PassId, PassConfig, SlabId } from "@/lib/passes";
+import { PASSES, getPrice, calculateTeamPrice, ACTIVE_SLAB, SLABS, MIN_TEAM_SIZE, MAX_TEAM_SIZE } from "@/lib/passes";
+import type { PassId, PassConfig, SlabId, MemberAffiliation } from "@/lib/passes";
 
 /* ─── Razorpay type ─── */
 declare global {
@@ -67,6 +67,9 @@ function RegisterPageInner() {
   const [step, setStep] = useState<FlowStep>("select");
   const [selectedPass, setSelectedPass] = useState<PassId | null>(null);
   const [form, setForm] = useState<FormData>({ ...initialForm });
+  const [memberAffiliations, setMemberAffiliations] = useState<MemberAffiliation[]>(["atrian", "atrian"]);
+  const [modalTargetIndex, setModalTargetIndex] = useState<number | null>(null);
+  const [hasPromptedMember2, setHasPromptedMember2] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
@@ -97,11 +100,33 @@ function RegisterPageInner() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* ── Auto-prompt for Member 2 if Atrians pass is active and hasn't prompted yet ── */
+  useEffect(() => {
+    if (selectedPass === "atrians" && step === "form" && !hasPromptedMember2) {
+      setModalTargetIndex(1);
+      setHasPromptedMember2(true);
+    }
+  }, [selectedPass, step, hasPromptedMember2]);
+
   const currentPasses = regStatus?.passes ?? PASSES;
+  const currentSlabId = regStatus?.slab ?? ACTIVE_SLAB;
   const pass = selectedPass ? currentPasses[selectedPass] : null;
   const teamSize = form.members.length;
-  const price = selectedPass ? (getPrice(selectedPass, teamSize, regStatus?.slab ?? "early-bird") ?? 0) : 0;
-  const badgeText = regStatus?.badgeText ?? "EARLY BIRD PRICES";
+
+  const atrianPrice = currentPasses.atrians?.perPerson ?? 280;
+  const nonAtrianPrice = currentPasses["non-atrians"]?.perPerson ?? 300;
+
+  const atrianCount = selectedPass === "atrians"
+    ? memberAffiliations.filter((a, idx) => idx === 0 || a === "atrian").length
+    : 0;
+  const nonAtrianCount = selectedPass === "atrians"
+    ? memberAffiliations.filter((a, idx) => idx > 0 && a === "non-atrian").length
+    : teamSize;
+
+  const price = selectedPass
+    ? (calculateTeamPrice(selectedPass, memberAffiliations, currentSlabId) ?? 0)
+    : 0;
+  const badgeText = regStatus?.badgeText ?? SLABS[ACTIVE_SLAB].badgeText;
 
   /* ── Leader syncs to member 0 ── */
   const updateLeader = useCallback((name: string) => {
@@ -122,20 +147,48 @@ function RegisterPageInner() {
     });
   }, []);
 
-  const addMember = useCallback(() => {
-    setForm(prev => {
-      if (prev.members.length >= MAX_TEAM_SIZE) return prev;
-      return { ...prev, members: [...prev.members, ""] };
-    });
-  }, []);
+  const handleAddMemberClick = useCallback(() => {
+    if (form.members.length >= MAX_TEAM_SIZE) return;
+    if (selectedPass === "atrians") {
+      setModalTargetIndex(form.members.length);
+    } else {
+      setForm(prev => ({ ...prev, members: [...prev.members, ""] }));
+      setMemberAffiliations(prev => [...prev, "non-atrian"]);
+      setOrderCache(null);
+    }
+  }, [form.members.length, selectedPass]);
+
+  const handleAffiliationChoice = useCallback((affiliation: MemberAffiliation) => {
+    if (modalTargetIndex === null) return;
+
+    if (modalTargetIndex >= form.members.length) {
+      if (form.members.length < MAX_TEAM_SIZE) {
+        setForm(prev => ({ ...prev, members: [...prev.members, ""] }));
+        setMemberAffiliations(prev => [...prev, affiliation]);
+      }
+    } else {
+      setMemberAffiliations(prev => {
+        const next = [...prev];
+        next[modalTargetIndex] = affiliation;
+        return next;
+      });
+    }
+
+    setModalTargetIndex(null);
+    setOrderCache(null);
+  }, [modalTargetIndex, form.members.length]);
 
   const removeMember = useCallback((index: number) => {
     setForm(prev => {
       if (prev.members.length <= MIN_TEAM_SIZE || index === 0) return prev;
       const members = prev.members.filter((_, i) => i !== index);
+
       return { ...prev, members };
     });
+    setMemberAffiliations(prev => prev.filter((_, i) => i !== index));
+    setOrderCache(null);
   }, []);
+
 
   /* ── Load Razorpay script ── */
   const loadRazorpay = useCallback((): Promise<boolean> => {
@@ -179,6 +232,7 @@ function RegisterPageInner() {
             email: form.email.trim(),
             collegeName: form.collegeName.trim(),
             members: form.members.map(m => m.trim()),
+            memberAffiliations: memberAffiliations,
           }),
         });
         const data = await res.json();
@@ -251,7 +305,7 @@ function RegisterPageInner() {
       setServerError(err.message || "Something went wrong.");
       setSubmitting(false);
     }
-  }, [form, selectedPass, pass, price, teamSize, loadRazorpay, orderCache]);
+  }, [form, selectedPass, pass, price, teamSize, memberAffiliations, loadRazorpay, orderCache]);
 
   /* ── Retry ── */
   const handleRetry = useCallback(() => {
@@ -262,12 +316,29 @@ function RegisterPageInner() {
   /* ── Select pass and go to form ── */
   const selectPass = useCallback((id: PassId) => {
     setSelectedPass(id);
-    setForm({ ...initialForm });
+    setForm({
+      teamName: "",
+      teamLeaderName: "",
+      contactNumber: "",
+      email: "",
+      collegeName: "",
+      members: ["", ""],
+    });
+    setMemberAffiliations(id === "atrians" ? ["atrian", "atrian"] : ["non-atrian", "non-atrian"]);
     setErrors({});
     setServerError("");
     setOrderCache(null);
     setStep("form");
+    if (id === "atrians") {
+      setModalTargetIndex(1);
+      setHasPromptedMember2(true);
+    } else {
+      setModalTargetIndex(null);
+      setHasPromptedMember2(false);
+    }
   }, []);
+
+
 
   return (
     <div className="site-shell">
@@ -371,13 +442,34 @@ function RegisterPageInner() {
                         <div className="reg-member-input-wrap">
                           {i === 0 ? (
                             <div className="reg-member-leader">
-                              <span className="reg-leader-badge">TEAM LEADER</span>
+                              <div className="reg-leader-badge-wrap">
+                                <span className="reg-leader-badge">LEADER</span>
+                                {selectedPass === "atrians" && (
+                                  <span className="reg-affil-chip atrian locked">ATRIA</span>
+                                )}
+                              </div>
                               <span>{form.teamLeaderName || "—"}</span>
                             </div>
                           ) : (
-                            <input type="text" placeholder={`Enter member ${i + 1} name`} value={m}
-                              onChange={e => { updateMember(i, e.target.value); setErrors(er => { const n = {...er}; delete n[`member_${i}`]; return n; }); }}
-                              className={errors[`member_${i}`] ? "has-error" : ""} />
+                            <div className="reg-member-input-row">
+                              <input
+                                type="text"
+                                placeholder={`Member ${i + 1} name`}
+                                value={m}
+                                onChange={e => { updateMember(i, e.target.value); setErrors(er => { const n = {...er}; delete n[`member_${i}`]; return n; }); }}
+                                className={errors[`member_${i}`] ? "has-error" : ""}
+                              />
+                              {selectedPass === "atrians" && (
+                                <button
+                                  type="button"
+                                  className={`reg-affil-chip ${memberAffiliations[i] === "atrian" ? "atrian" : "non-atrian"}`}
+                                  onClick={() => setModalTargetIndex(i)}
+                                  title="Click to change affiliation"
+                                >
+                                  {memberAffiliations[i] === "atrian" ? `Atrian • ₹${atrianPrice}` : `Non-Atrian • ₹${nonAtrianPrice}`}
+                                </button>
+                              )}
+                            </div>
                           )}
                           {errors[`member_${i}`] && <span className="field-error"><AlertCircle size={12} /> {errors[`member_${i}`]}</span>}
                         </div>
@@ -389,7 +481,7 @@ function RegisterPageInner() {
                   </div>
 
                   {teamSize < MAX_TEAM_SIZE && (
-                    <button className="reg-add-member-btn" onClick={addMember}><Plus size={16} /> Add Team Member</button>
+                    <button className="reg-add-member-btn" onClick={handleAddMemberClick}><Plus size={16} /> Add Team Member</button>
                   )}
                 </div>
 
@@ -397,8 +489,26 @@ function RegisterPageInner() {
                 <aside className="reg-summary-card">
                   <h4 className="reg-summary-title"><CreditCard size={16} /> ORDER SUMMARY</h4>
                   <div className="reg-summary-row"><span>Pass</span><strong>{pass.name}</strong></div>
-                  <div className="reg-summary-row"><span>Per Person</span><span>₹{pass.perPerson}</span></div>
                   <div className="reg-summary-row"><span>Team Size</span><span>{teamSize} Members</span></div>
+
+                  {selectedPass === "atrians" && nonAtrianCount > 0 ? (
+                    <>
+                      <div className="reg-summary-sub-row atrian-row">
+                        <span>Atrian ({atrianCount} × ₹{atrianPrice})</span>
+                        <strong>₹{atrianCount * atrianPrice}</strong>
+                      </div>
+                      <div className="reg-summary-sub-row external-row">
+                        <span>Non-Atrian ({nonAtrianCount} × ₹{nonAtrianPrice})</span>
+                        <strong>₹{nonAtrianCount * nonAtrianPrice}</strong>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="reg-summary-row">
+                      <span>Per Person</span>
+                      <span>₹{selectedPass === "atrians" ? atrianPrice : nonAtrianPrice}</span>
+                    </div>
+                  )}
+
                   <div className="reg-summary-divider" />
                   <div className="reg-summary-row reg-summary-total"><span>Total</span><strong>₹{price}</strong></div>
 
@@ -468,6 +578,47 @@ function RegisterPageInner() {
               </div>
             </div>
           </section>
+        )}
+
+        {/* ── Minimal Affiliation Question Modal ── */}
+        {modalTargetIndex !== null && (
+          <div className="reg-modal-backdrop" onClick={() => setModalTargetIndex(null)}>
+            <div className="reg-modal-box" onClick={e => e.stopPropagation()}>
+              <button
+                type="button"
+                className="reg-modal-close"
+                onClick={() => setModalTargetIndex(null)}
+                aria-label="Close"
+              >
+                <X size={14} />
+              </button>
+              <p className="reg-modal-meta">MEMBER #{modalTargetIndex + 1} // AFFILIATION</p>
+              <h3 className="reg-modal-title">Is this member an Atrian?</h3>
+              <p className="reg-modal-sub">Select college to update the pass rate</p>
+
+              <div className="reg-modal-cards">
+                <button
+                  type="button"
+                  className="reg-modal-btn atrian"
+                  onClick={() => handleAffiliationChoice("atrian")}
+                >
+                  <span className="reg-modal-btn-label">Atria Student</span>
+                  <span className="reg-modal-btn-sub">AIT Bengaluru</span>
+                  <span className="reg-modal-btn-price">₹{atrianPrice}</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="reg-modal-btn non-atrian"
+                  onClick={() => handleAffiliationChoice("non-atrian")}
+                >
+                  <span className="reg-modal-btn-label">Non-Atrian</span>
+                  <span className="reg-modal-btn-sub">External College</span>
+                  <span className="reg-modal-btn-price">₹{nonAtrianPrice}</span>
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
       </main>

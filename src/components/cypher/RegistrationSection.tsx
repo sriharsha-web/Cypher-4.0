@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Check, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { PASSES } from "@/lib/passes";
+import { PASSES, ACTIVE_SLAB, SLABS } from "@/lib/passes";
 import type { PassConfig, PassId, SlabId } from "@/lib/passes";
 
 interface RegistrationStatus {
@@ -34,7 +34,7 @@ export function RegistrationSection() {
   }, []);
 
   const passes = status?.passes ?? PASSES;
-  const badgeText = status?.badgeText ?? "EARLY BIRD PRICES";
+  const badgeText = status?.badgeText ?? SLABS[ACTIVE_SLAB].badgeText;
 
   return (
     <section id="register" className="register-section">

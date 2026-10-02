@@ -102,7 +102,7 @@ export const SLABS: Record<SlabId, SlabConfig> = {
 };
 
 /** Active pricing slab - manually configurable */
-export const ACTIVE_SLAB: SlabId = "early-bird";
+export const ACTIVE_SLAB: SlabId = "slab-1";
 
 /** Default passes based on active slab */
 export const PASSES: Record<PassId, PassConfig> = SLABS[ACTIVE_SLAB].passes;
@@ -116,6 +116,39 @@ export function getPass(id: string, slabId: SlabId = ACTIVE_SLAB): PassConfig | 
   return passes[id as PassId];
 }
 
+export type MemberAffiliation = "atrian" | "non-atrian";
+
+/**
+ * Calculates total price for a team, supporting mixed Atrian/Non-Atrian affiliation
+ * when registering under the Atrians pass.
+ */
+export function calculateTeamPrice(
+  passId: string,
+  memberAffiliations: MemberAffiliation[],
+  slabId: SlabId = ACTIVE_SLAB
+): number | undefined {
+  const pass = getPass(passId, slabId);
+  if (!pass) return undefined;
+  const teamSize = memberAffiliations.length;
+  if (teamSize < MIN_TEAM_SIZE || teamSize > MAX_TEAM_SIZE) return undefined;
+
+  const passes = getPassesForSlab(slabId);
+  const atrianPrice = passes.atrians.perPerson;
+  const nonAtrianPrice = passes["non-atrians"].perPerson;
+
+  if (passId === "non-atrians") {
+    return teamSize * nonAtrianPrice;
+  }
+
+  // Atrians pass: Leader is always atrian, other members billed according to affiliation
+  let total = 0;
+  for (let i = 0; i < teamSize; i++) {
+    const isAtrian = i === 0 ? true : memberAffiliations[i] === "atrian";
+    total += isAtrian ? atrianPrice : nonAtrianPrice;
+  }
+  return total;
+}
+
 export function getPrice(passId: string, teamSize: number, slabId: SlabId = ACTIVE_SLAB): number | undefined {
   const pass = getPass(passId, slabId);
   if (!pass) return undefined;
@@ -125,3 +158,4 @@ export function getPrice(passId: string, teamSize: number, slabId: SlabId = ACTI
 
 export const MIN_TEAM_SIZE = 2;
 export const MAX_TEAM_SIZE = 4;
+

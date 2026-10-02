@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPass, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE, ACTIVE_SLAB } from "@/lib/passes";
+import { getPass, getPrice, calculateTeamPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE, ACTIVE_SLAB } from "@/lib/passes";
+import type { MemberAffiliation, PassId } from "@/lib/passes";
 import { getRazorpayInstance, generateRegistrationId } from "@/lib/razorpay";
 import { appendRegistration } from "@/lib/sheets";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { passId, teamName, teamLeaderName, contactNumber, email, collegeName, members } = body;
+    const { passId, teamName, teamLeaderName, contactNumber, email, collegeName, members, memberAffiliations } = body;
 
     const slab = ACTIVE_SLAB;
 
@@ -38,10 +39,20 @@ export async function POST(req: NextRequest) {
       if (!m?.trim()) return NextResponse.json({ error: "All team member names are required." }, { status: 400 });
     }
 
-    const amount = getPrice(passId, members.length, slab);
+    // Resolve affiliations for price calculation
+    const affiliations: MemberAffiliation[] = members.map((_, i) => {
+      if (passId === "non-atrians") return "non-atrian";
+      if (i === 0) return "atrian"; // Leader is always Atrian for atrian pass
+      return memberAffiliations?.[i] === "non-atrian" ? "non-atrian" : "atrian";
+    });
+
+    const amount = calculateTeamPrice(passId as PassId, affiliations, slab);
     if (!amount) {
       return NextResponse.json({ error: "Unable to calculate price." }, { status: 400 });
     }
+
+    const atrianCount = affiliations.filter((a) => a === "atrian").length;
+    const nonAtrianCount = affiliations.filter((a) => a === "non-atrian").length;
 
     const razorpay = getRazorpayInstance();
     const registrationId = generateRegistrationId();
@@ -56,8 +67,11 @@ export async function POST(req: NextRequest) {
         teamSize: String(members.length),
         registrationId,
         slab,
+        atrianCount: String(atrianCount),
+        nonAtrianCount: String(nonAtrianCount),
       },
     });
+
 
     try {
       await appendRegistration({
@@ -70,7 +84,13 @@ export async function POST(req: NextRequest) {
         email: email.trim(),
         collegeName: collegeName.trim(),
         teamSize: members.length,
-        members: members.map((m: string) => m.trim()),
+        members: members.map((m: string, idx: number) => {
+          const cleanName = m.trim();
+          if (passId === "atrians" && affiliations[idx] === "non-atrian") {
+            return `${cleanName} (Non-Atrian)`;
+          }
+          return cleanName;
+        }),
         amount,
         currency: "INR",
         paymentStatus: "CREATED",
