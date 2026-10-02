@@ -16,8 +16,8 @@ const SHEET_ID = process.env.GOOGLE_SHEETS_ID!;
 
 /** Map pass name to the correct sheet tab */
 function getTabName(passName: string): string {
-  if (passName === "ATRIANS") return "Atrians";
-  if (passName === "NON-ATRIANS") return "Non-atrians";
+  const normalized = (passName || "").trim().toUpperCase();
+  if (normalized === "NON-ATRIANS") return "Non-atrians";
   return "Atrians"; // fallback
 }
 
@@ -97,7 +97,7 @@ export async function updatePaymentStatus(
       const rows = response.data.values || [];
       let rowIndex = -1;
       for (let i = 0; i < rows.length; i++) {
-        if (rows[i][0] === razorpayOrderId) {
+        if (rows[i]?.[0] === razorpayOrderId) {
           rowIndex = i + 1;
           break;
         }
