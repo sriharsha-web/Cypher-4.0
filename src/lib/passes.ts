@@ -1,6 +1,6 @@
 /**
  * Centralized pass & pricing configuration supporting pricing tiers/slabs.
- * Early Bird is active for the first 5 teams; after 5 completions, it switches to Slab 1 (+₹20/person).
+ * Pricing is manually controlled via ACTIVE_SLAB.
  */
 
 export type PassId = "atrians" | "non-atrians";
@@ -101,19 +101,22 @@ export const SLABS: Record<SlabId, SlabConfig> = {
   },
 };
 
-/** Default passes (Early Bird) */
-export const PASSES: Record<PassId, PassConfig> = SLABS["early-bird"].passes;
+/** Active pricing slab - manually configurable */
+export const ACTIVE_SLAB: SlabId = "early-bird";
 
-export function getPassesForSlab(slabId: SlabId = "early-bird"): Record<PassId, PassConfig> {
-  return SLABS[slabId]?.passes ?? SLABS["early-bird"].passes;
+/** Default passes based on active slab */
+export const PASSES: Record<PassId, PassConfig> = SLABS[ACTIVE_SLAB].passes;
+
+export function getPassesForSlab(slabId: SlabId = ACTIVE_SLAB): Record<PassId, PassConfig> {
+  return SLABS[slabId]?.passes ?? SLABS[ACTIVE_SLAB].passes;
 }
 
-export function getPass(id: string, slabId: SlabId = "early-bird"): PassConfig | undefined {
+export function getPass(id: string, slabId: SlabId = ACTIVE_SLAB): PassConfig | undefined {
   const passes = getPassesForSlab(slabId);
   return passes[id as PassId];
 }
 
-export function getPrice(passId: string, teamSize: number, slabId: SlabId = "early-bird"): number | undefined {
+export function getPrice(passId: string, teamSize: number, slabId: SlabId = ACTIVE_SLAB): number | undefined {
   const pass = getPass(passId, slabId);
   if (!pass) return undefined;
   if (teamSize < 2 || teamSize > 4) return undefined;
@@ -122,4 +125,3 @@ export function getPrice(passId: string, teamSize: number, slabId: SlabId = "ear
 
 export const MIN_TEAM_SIZE = 2;
 export const MAX_TEAM_SIZE = 4;
-export const EARLY_BIRD_LIMIT = 5;

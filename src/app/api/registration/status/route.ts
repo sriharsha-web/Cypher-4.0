@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRegisteredTeamsCount } from "@/lib/sheets";
-import { EARLY_BIRD_LIMIT, SLABS } from "@/lib/passes";
+import { ACTIVE_SLAB, SLABS } from "@/lib/passes";
 import type { SlabId } from "@/lib/passes";
 
 export const dynamic = "force-dynamic";
@@ -8,8 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const registeredCount = await getRegisteredTeamsCount();
-    const isEarlyBirdClosed = registeredCount >= EARLY_BIRD_LIMIT;
-    const slab: SlabId = isEarlyBirdClosed ? "slab-1" : "early-bird";
+    const slab: SlabId = ACTIVE_SLAB;
     const currentSlab = SLABS[slab];
 
     return NextResponse.json({
@@ -21,9 +20,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Failed to fetch registration status:", error);
-    const fallbackSlab = SLABS["early-bird"];
+    const fallbackSlab = SLABS[ACTIVE_SLAB];
     return NextResponse.json({
-      slab: "early-bird",
+      slab: ACTIVE_SLAB,
       label: fallbackSlab.label,
       badgeText: fallbackSlab.badgeText,
       passes: fallbackSlab.passes,

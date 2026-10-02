@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPass, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE, EARLY_BIRD_LIMIT } from "@/lib/passes";
+import { getPass, getPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE, ACTIVE_SLAB } from "@/lib/passes";
 import { getRazorpayInstance, generateRegistrationId } from "@/lib/razorpay";
-import { appendRegistration, getRegisteredTeamsCount } from "@/lib/sheets";
+import { appendRegistration } from "@/lib/sheets";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { passId, teamName, teamLeaderName, contactNumber, email, collegeName, members } = body;
 
-    const registeredCount = await getRegisteredTeamsCount();
-    const slab = registeredCount >= EARLY_BIRD_LIMIT ? "slab-1" : "early-bird";
+    const slab = ACTIVE_SLAB;
 
     const pass = getPass(passId, slab);
     if (!pass) {
