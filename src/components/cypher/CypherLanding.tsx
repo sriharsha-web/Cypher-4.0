@@ -17,7 +17,8 @@ import { ScheduleSection } from "./ScheduleSection";
 import { PastEventsSection } from "./PastEventsSection";
 import { tracks } from "./data";
 
-const TARGET_EVENT_DATE = new Date("2026-10-09T09:00:00+05:30").getTime();
+// October 9, 2026, 14:00:00 IST (2:00 PM IST => UTC+5:30 -> 08:30:00 UTC)
+const TARGET_EVENT_DATE = Date.UTC(2026, 9, 9, 8, 30, 0);
 
 function calculateTimeLeft() {
   const difference = TARGET_EVENT_DATE - Date.now();
@@ -40,7 +41,16 @@ export function CypherLanding() {
   useEffect(() => {
     setTimeLeft(calculateTimeLeft());
     const timer = window.setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      const current = calculateTimeLeft();
+      setTimeLeft(current);
+      if (
+        current.days === 0 &&
+        current.hours === 0 &&
+        current.minutes === 0 &&
+        current.seconds === 0
+      ) {
+        window.clearInterval(timer);
+      }
     }, 1000);
     return () => window.clearInterval(timer);
   }, []);
