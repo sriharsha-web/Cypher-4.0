@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
     if (!teamLeaderName?.trim()) return NextResponse.json({ error: "Team leader name is required." }, { status: 400 });
     if (!contactNumber?.trim()) return NextResponse.json({ error: "Contact number is required." }, { status: 400 });
     if (!email?.trim()) return NextResponse.json({ error: "Email is required." }, { status: 400 });
-    if (!collegeName?.trim()) return NextResponse.json({ error: "College name is required." }, { status: 400 });
+    const finalCollegeName = passId === "atrians" ? "Atria Institute of Technology" : collegeName?.trim();
+    if (!finalCollegeName) return NextResponse.json({ error: "College name is required." }, { status: 400 });
 
     const phoneClean = contactNumber.replace(/\D/g, "");
     if (phoneClean.length !== 10) {
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
         teamLeaderName: teamLeaderName.trim(),
         contactNumber: "+91" + phoneClean,
         email: email.trim(),
-        collegeName: collegeName.trim(),
+        collegeName: finalCollegeName,
         teamSize: members.length,
         members: members.map((m: string, idx: number) => {
           const cleanName = m.trim();

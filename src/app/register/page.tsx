@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle, MessageSquare, GraduationCap, Globe } from "lucide-react";
+import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle, MessageSquare, GraduationCap, Globe, Lock } from "lucide-react";
 import { Header } from "@/components/cypher/Header";
 import { PASSES, getPrice, calculateTeamPrice, ACTIVE_SLAB, SLABS, MIN_TEAM_SIZE, MAX_TEAM_SIZE } from "@/lib/passes";
 import type { PassId, PassConfig, SlabId, MemberAffiliation } from "@/lib/passes";
@@ -36,6 +36,8 @@ interface SuccessData {
   paymentId: string;
 }
 
+const ATRIA_COLLEGE_NAME = "Atria Institute of Technology";
+
 const initialForm: FormData = {
   teamName: "",
   teamLeaderName: "",
@@ -46,7 +48,7 @@ const initialForm: FormData = {
 };
 
 /* ─── Validation ─── */
-function validateForm(data: FormData): Record<string, string> {
+function validateForm(data: FormData, passId?: PassId | null): Record<string, string> {
   const errors: Record<string, string> = {};
   if (!data.teamName.trim()) errors.teamName = "Team name is required";
   if (!data.teamLeaderName.trim()) errors.teamLeaderName = "Team leader name is required";
@@ -55,7 +57,7 @@ function validateForm(data: FormData): Record<string, string> {
   else if (phone.length !== 10) errors.contactNumber = "Enter exactly 10 digits";
   if (!data.email.trim()) errors.email = "Email is required";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = "Enter a valid email";
-  if (!data.collegeName.trim()) errors.collegeName = "College name is required";
+  if (passId !== "atrians" && !data.collegeName.trim()) errors.collegeName = "College name is required";
   data.members.forEach((m, i) => {
     if (!m.trim()) errors[`member_${i}`] = `Member ${i + 1} name is required`;
   });
@@ -107,6 +109,13 @@ function RegisterPageInner() {
       setHasPromptedMember2(true);
     }
   }, [selectedPass, step, hasPromptedMember2]);
+
+  /* ── Keep Atria college locked if Atrians pass is active ── */
+  useEffect(() => {
+    if (selectedPass === "atrians" && form.collegeName !== ATRIA_COLLEGE_NAME) {
+      setForm(f => ({ ...f, collegeName: ATRIA_COLLEGE_NAME }));
+    }
+  }, [selectedPass, form.collegeName]);
 
   const currentPasses = regStatus?.passes ?? PASSES;
   const currentSlabId = regStatus?.slab ?? ACTIVE_SLAB;
@@ -205,7 +214,7 @@ function RegisterPageInner() {
   /* ── Payment ── */
   const handleSubmit = useCallback(async () => {
     setServerError("");
-    const validationErrors = validateForm(form);
+    const validationErrors = validateForm(form, selectedPass);
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
     if (!selectedPass || !pass) return;
@@ -221,6 +230,7 @@ function RegisterPageInner() {
       let registrationId = orderCache?.registrationId;
 
       if (!orderId) {
+        const finalCollege = selectedPass === "atrians" ? ATRIA_COLLEGE_NAME : form.collegeName.trim();
         const res = await fetch("/api/registration/create-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -230,7 +240,7 @@ function RegisterPageInner() {
             teamLeaderName: form.teamLeaderName.trim(),
             contactNumber: form.contactNumber.replace(/\D/g, ""),
             email: form.email.trim(),
-            collegeName: form.collegeName.trim(),
+            collegeName: finalCollege,
             members: form.members.map(m => m.trim()),
             memberAffiliations: memberAffiliations,
           }),
@@ -321,7 +331,7 @@ function RegisterPageInner() {
       teamLeaderName: "",
       contactNumber: "",
       email: "",
-      collegeName: "",
+      collegeName: id === "atrians" ? ATRIA_COLLEGE_NAME : "",
       members: ["", ""],
     });
     setMemberAffiliations(id === "atrians" ? ["atrian", "atrian"] : ["non-atrian", "non-atrian"]);
@@ -425,12 +435,33 @@ function RegisterPageInner() {
                     {errors.email && <span className="field-error"><AlertCircle size={12} /> {errors.email}</span>}
                   </div>
 
-                  <div className="reg-field">
-                    <label htmlFor="college">College Name <span className="req">*</span></label>
-                    <input id="college" type="text" placeholder="Enter college name" value={form.collegeName}
-                      onChange={e => { setForm(f => ({ ...f, collegeName: e.target.value })); setErrors(e2 => { const n = {...e2}; delete n.collegeName; return n; }); }} className={errors.collegeName ? "has-error" : ""} />
-                    {errors.collegeName && <span className="field-error"><AlertCircle size={12} /> {errors.collegeName}</span>}
-                  </div>
+                  {selectedPass === "atrians" ? (
+                    <div className="reg-field">
+                      <label htmlFor="college">College Name</label>
+                      <div className="reg-locked-field" id="college">
+                        <span className="reg-locked-value">{ATRIA_COLLEGE_NAME}</span>
+                        <span className="reg-locked-pill">
+                          <Lock size={11} /> LOCKED
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="reg-field">
+                      <label htmlFor="college">College Name <span className="req">*</span></label>
+                      <input
+                        id="college"
+                        type="text"
+                        placeholder="Enter college name"
+                        value={form.collegeName}
+                        onChange={e => {
+                          setForm(f => ({ ...f, collegeName: e.target.value }));
+                          setErrors(e2 => { const n = { ...e2 }; delete n.collegeName; return n; });
+                        }}
+                        className={errors.collegeName ? "has-error" : ""}
+                      />
+                      {errors.collegeName && <span className="field-error"><AlertCircle size={12} /> {errors.collegeName}</span>}
+                    </div>
+                  )}
 
                   {/* Team Members */}
                   <h4 className="reg-form-section-title"><Users size={16} /> TEAM MEMBERS ({teamSize}/{MAX_TEAM_SIZE})</h4>
