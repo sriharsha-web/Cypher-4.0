@@ -4,7 +4,7 @@
  */
 
 export type PassId = "atrians" | "non-atrians";
-export type SlabId = "early-bird" | "slab-1";
+export type SlabId = "early-bird" | "slab-1" | "slab-2";
 
 export interface PassConfig {
   id: PassId;
@@ -99,10 +99,43 @@ export const SLABS: Record<SlabId, SlabConfig> = {
       },
     },
   },
+  "slab-2": {
+    id: "slab-2",
+    label: "Slab 2",
+    badgeText: "SLAB 2 PRICES",
+    passes: {
+      atrians: {
+        id: "atrians",
+        name: "ATRIANS",
+        description: "Entry-level orbital access for Atria personnel.",
+        perPerson: 310,
+        featured: false,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 620,
+          3: 930,
+          4: 1240,
+        },
+      },
+      "non-atrians": {
+        id: "non-atrians",
+        name: "NON-ATRIANS",
+        description: "Interstellar access for all external technical entities.",
+        perPerson: 330,
+        featured: true,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 660,
+          3: 990,
+          4: 1320,
+        },
+      },
+    },
+  },
 };
 
 /** Active pricing slab - manually configurable */
-export const ACTIVE_SLAB: SlabId = "slab-1";
+export const ACTIVE_SLAB: SlabId = "slab-2";
 
 /** Default passes based on active slab */
 export const PASSES: Record<PassId, PassConfig> = SLABS[ACTIVE_SLAB].passes;

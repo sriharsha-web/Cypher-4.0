@@ -122,8 +122,8 @@ function RegisterPageInner() {
   const pass = selectedPass ? currentPasses[selectedPass] : null;
   const teamSize = form.members.length;
 
-  const atrianPrice = currentPasses.atrians?.perPerson ?? 280;
-  const nonAtrianPrice = currentPasses["non-atrians"]?.perPerson ?? 300;
+  const atrianPrice = currentPasses.atrians?.perPerson ?? 310;
+  const nonAtrianPrice = currentPasses["non-atrians"]?.perPerson ?? 330;
 
   const atrianCount = selectedPass === "atrians"
     ? memberAffiliations.filter((a, idx) => idx === 0 || a === "atrian").length
