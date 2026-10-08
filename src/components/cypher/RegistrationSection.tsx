@@ -83,8 +83,8 @@ export function RegistrationSection() {
           <div className="reg-sold-out-banner">
             <AlertCircle size={20} />
             <div>
-              <strong>Slab 2 Closed for Registrations</strong>
-              <p>{closedMessage}</p>
+              <strong>Registrations Closed — House Full</strong>
+              <p>{closedMessage || "Registrations are closed. House Full!"}</p>
             </div>
           </div>
         )}
@@ -107,7 +107,7 @@ export function RegistrationSection() {
             </ul>
             {isClosed ? (
               <button className="button button-outline pass-btn pass-btn-disabled" disabled>
-                Slab 2 Closed
+                House Full
               </button>
             ) : (
               <Link
@@ -137,7 +137,7 @@ export function RegistrationSection() {
             </ul>
             {isClosed ? (
               <button className="button button-acid pass-btn pass-btn-disabled" disabled>
-                Slab 2 Closed
+                House Full
               </button>
             ) : (
               <Link

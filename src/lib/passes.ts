@@ -102,7 +102,7 @@ export const SLABS: Record<SlabId, SlabConfig> = {
   "slab-2": {
     id: "slab-2",
     label: "Slab 2",
-    badgeText: "SLAB 2 CLOSED • SLAB 3 OPENS AT 12 PM TODAY",
+    badgeText: "REGISTRATIONS CLOSED • HOUSE FULL",
     passes: {
       atrians: {
         id: "atrians",
@@ -135,7 +135,7 @@ export const SLABS: Record<SlabId, SlabConfig> = {
   "slab-3": {
     id: "slab-3",
     label: "Slab 3",
-    badgeText: "SLAB 3 PRICES",
+    badgeText: "REGISTRATIONS CLOSED • HOUSE FULL",
     passes: {
       atrians: {
         id: "atrians",
@@ -174,25 +174,25 @@ export const SLAB_3_OPEN_TIME = new Date("2026-10-08T12:00:00+05:30").getTime();
 
 /** Check if Slab 3 has launched / is currently active */
 export function isSlab3Live(): boolean {
-  return Date.now() >= SLAB_3_OPEN_TIME;
+  return true;
 }
 
-/** Check if registrations are currently closed (closed before 12:00 PM today) */
+/** Check if registrations are currently closed (House Full) */
 export function isRegistrationClosed(): boolean {
-  return !isSlab3Live();
+  return true;
 }
 
 /** Dynamic active slab ID based on current time */
 export function getActiveSlabId(): SlabId {
-  return isSlab3Live() ? "slab-3" : "slab-2";
+  return "slab-3";
 }
 
 /** Static fallback boolean (evaluated dynamically at runtime via isRegistrationClosed()) */
 export const REGISTRATION_CLOSED = true;
-export const REGISTRATION_CLOSED_MESSAGE = "Slab 2 closed for registrations. Slab 3 opens at 12 PM today.";
+export const REGISTRATION_CLOSED_MESSAGE = "Registrations are closed. House Full!";
 
 /** Static fallback slab (evaluated dynamically at runtime via getActiveSlabId()) */
-export const ACTIVE_SLAB: SlabId = "slab-2";
+export const ACTIVE_SLAB: SlabId = "slab-3";
 
 /** Default passes based on active slab */
 export const PASSES: Record<PassId, PassConfig> = SLABS[ACTIVE_SLAB].passes;

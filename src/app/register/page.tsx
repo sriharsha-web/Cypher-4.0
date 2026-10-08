@@ -409,8 +409,8 @@ function RegisterPageInner() {
                 <div className="reg-sold-out-banner">
                   <AlertCircle size={20} />
                   <div>
-                    <strong>Slab 2 Closed for Registrations</strong>
-                    <p>{closedMessage}</p>
+                    <strong>Registrations Closed — House Full</strong>
+                    <p>{closedMessage || "Registrations are closed. House Full!"}</p>
                   </div>
                 </div>
               )}
@@ -427,7 +427,7 @@ function RegisterPageInner() {
                     </ul>
                     {isClosed ? (
                       <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn pass-btn-disabled`} disabled>
-                        Slab 2 Closed
+                        House Full
                       </button>
                     ) : (
                       <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn`} onClick={() => selectPass(p.id)}>
@@ -453,8 +453,8 @@ function RegisterPageInner() {
                 <div className="reg-sold-out-banner">
                   <AlertCircle size={20} />
                   <div>
-                    <strong>Slab 2 Closed for Registrations</strong>
-                    <p>{closedMessage}</p>
+                    <strong>Registrations Closed — House Full</strong>
+                    <p>{closedMessage || "Registrations are closed. House Full!"}</p>
                   </div>
                 </div>
               )}
@@ -614,7 +614,7 @@ function RegisterPageInner() {
 
                   {isClosed ? (
                     <button className="button button-outline reg-pay-btn pass-btn-disabled" disabled>
-                      Slab 2 Closed
+                      House Full
                     </button>
                   ) : (
                     <button className="button button-acid reg-pay-btn" onClick={handleSubmit} disabled={submitting}>
