@@ -102,7 +102,7 @@ export const SLABS: Record<SlabId, SlabConfig> = {
   "slab-2": {
     id: "slab-2",
     label: "Slab 2",
-    badgeText: "SLAB 2 CLOSED • STAY TUNED FOR SLAB 3",
+    badgeText: "SLAB 2 CLOSED • SLAB 3 OPENS AT 12 PM TODAY",
     passes: {
       atrians: {
         id: "atrians",
@@ -136,7 +136,7 @@ export const SLABS: Record<SlabId, SlabConfig> = {
 
 /** Whether registrations are currently closed between slabs */
 export const REGISTRATION_CLOSED = true;
-export const REGISTRATION_CLOSED_MESSAGE = "Slab 2 closed for registrations, stay tuned for Slab 3.";
+export const REGISTRATION_CLOSED_MESSAGE = "Slab 2 closed for registrations. Slab 3 opens at 12 PM today.";
 
 /** Active pricing slab - manually configurable */
 export const ACTIVE_SLAB: SlabId = "slab-2";
