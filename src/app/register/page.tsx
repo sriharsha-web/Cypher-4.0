@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle, MessageSquare, GraduationCap, Globe, Lock } from "lucide-react";
 import { Header } from "@/components/cypher/Header";
-import { PASSES, getPrice, calculateTeamPrice, ACTIVE_SLAB, SLABS, MIN_TEAM_SIZE, MAX_TEAM_SIZE } from "@/lib/passes";
+import { PASSES, getPrice, calculateTeamPrice, ACTIVE_SLAB, SLABS, MIN_TEAM_SIZE, MAX_TEAM_SIZE, REGISTRATION_CLOSED, REGISTRATION_CLOSED_MESSAGE } from "@/lib/passes";
 import type { PassId, PassConfig, SlabId, MemberAffiliation } from "@/lib/passes";
 
 /* ─── Razorpay type ─── */
@@ -83,6 +83,8 @@ function RegisterPageInner() {
     label: string;
     badgeText: string;
     passes: Record<PassId, PassConfig>;
+    isClosed?: boolean;
+    closedMessage?: string;
   } | null>(null);
   const searchParams = useSearchParams();
 
@@ -136,6 +138,8 @@ function RegisterPageInner() {
     ? (calculateTeamPrice(selectedPass, memberAffiliations, currentSlabId) ?? 0)
     : 0;
   const badgeText = regStatus?.badgeText ?? SLABS[ACTIVE_SLAB].badgeText;
+  const isClosed = regStatus?.isClosed ?? REGISTRATION_CLOSED;
+  const closedMessage = regStatus?.closedMessage ?? REGISTRATION_CLOSED_MESSAGE;
 
   /* ── Leader syncs to member 0 ── */
   const updateLeader = useCallback((name: string) => {
@@ -363,8 +367,20 @@ function RegisterPageInner() {
               <p className="mono-label">REGISTRATION / SELECT PASS</p>
               <div className="reg-heading-row">
                 <h1>SELECT YOUR PASS</h1>
-                <span className="early-bird-badge"><Sparkles size={13} /> {badgeText}</span>
+                <span className={`early-bird-badge${isClosed ? " early-bird-sold-out" : ""}`}>
+                  {isClosed ? <AlertCircle size={13} /> : <Sparkles size={13} />} {badgeText}
+                </span>
               </div>
+
+              {isClosed && (
+                <div className="reg-sold-out-banner">
+                  <AlertCircle size={20} />
+                  <div>
+                    <strong>Slab 2 Closed for Registrations</strong>
+                    <p>{closedMessage}</p>
+                  </div>
+                </div>
+              )}
 
               <div className="reg-passes">
                 {Object.values(currentPasses).map((p) => (
@@ -376,9 +392,15 @@ function RegisterPageInner() {
                     <ul className="pass-benefits">
                       {p.benefits.map((b, i) => <li key={i}><Check size={15} /><span>{b}</span></li>)}
                     </ul>
-                    <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn`} onClick={() => selectPass(p.id)}>
-                      Register Now <ArrowUpRight size={16} />
-                    </button>
+                    {isClosed ? (
+                      <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn pass-btn-disabled`} disabled>
+                        Slab 2 Closed
+                      </button>
+                    ) : (
+                      <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn`} onClick={() => selectPass(p.id)}>
+                        Register Now <ArrowUpRight size={16} />
+                      </button>
+                    )}
                   </article>
                 ))}
               </div>
@@ -393,6 +415,16 @@ function RegisterPageInner() {
               <button className="reg-back-link" onClick={() => { setStep("select"); setOrderCache(null); }}><ArrowLeft size={14} /> Change Pass</button>
               <p className="mono-label">REGISTRATION / {pass.name}</p>
               <h1>REGISTER YOUR TEAM</h1>
+
+              {isClosed && (
+                <div className="reg-sold-out-banner">
+                  <AlertCircle size={20} />
+                  <div>
+                    <strong>Slab 2 Closed for Registrations</strong>
+                    <p>{closedMessage}</p>
+                  </div>
+                </div>
+              )}
 
               <div className="reg-form-layout">
                 {/* Form */}
@@ -547,9 +579,15 @@ function RegisterPageInner() {
                     <div className="reg-server-error"><AlertCircle size={14} /> {serverError}</div>
                   )}
 
-                  <button className="button button-acid reg-pay-btn" onClick={handleSubmit} disabled={submitting}>
-                    {submitting ? <><Loader2 size={16} className="spin" /> Processing...</> : <>Proceed to Payment <ArrowUpRight size={16} /></>}
-                  </button>
+                  {isClosed ? (
+                    <button className="button button-outline reg-pay-btn pass-btn-disabled" disabled>
+                      Slab 2 Closed
+                    </button>
+                  ) : (
+                    <button className="button button-acid reg-pay-btn" onClick={handleSubmit} disabled={submitting}>
+                      {submitting ? <><Loader2 size={16} className="spin" /> Processing...</> : <>Proceed to Payment <ArrowUpRight size={16} /></>}
+                    </button>
+                  )}
                 </aside>
               </div>
             </div>

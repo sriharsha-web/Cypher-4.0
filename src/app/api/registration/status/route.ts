@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRegisteredTeamsCount } from "@/lib/sheets";
-import { ACTIVE_SLAB, SLABS } from "@/lib/passes";
+import { ACTIVE_SLAB, SLABS, REGISTRATION_CLOSED, REGISTRATION_CLOSED_MESSAGE } from "@/lib/passes";
 import type { SlabId } from "@/lib/passes";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +17,8 @@ export async function GET() {
       badgeText: currentSlab.badgeText,
       passes: currentSlab.passes,
       registeredCount,
+      isClosed: REGISTRATION_CLOSED,
+      closedMessage: REGISTRATION_CLOSED_MESSAGE,
     });
   } catch (error) {
     console.error("Failed to fetch registration status:", error);
@@ -27,6 +29,8 @@ export async function GET() {
       badgeText: fallbackSlab.badgeText,
       passes: fallbackSlab.passes,
       registeredCount: 0,
+      isClosed: REGISTRATION_CLOSED,
+      closedMessage: REGISTRATION_CLOSED_MESSAGE,
     });
   }
 }
