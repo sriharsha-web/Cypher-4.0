@@ -1,9 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ArrowUpRight, Check, Sparkles, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { PASSES, ACTIVE_SLAB, SLABS, REGISTRATION_CLOSED, REGISTRATION_CLOSED_MESSAGE } from "@/lib/passes";
+import {
+  SLABS,
+  SLAB_3_OPEN_TIME,
+  isRegistrationClosed,
+  getActiveSlabId,
+  getPassesForSlab,
+  REGISTRATION_CLOSED_MESSAGE,
+} from "@/lib/passes";
 import type { PassConfig, PassId, SlabId } from "@/lib/passes";
 
 interface RegistrationStatus {
@@ -13,6 +20,7 @@ interface RegistrationStatus {
   passes: Record<PassId, PassConfig>;
   isClosed?: boolean;
   closedMessage?: string;
+  opensAt?: number;
 }
 
 const passBenefits = [
@@ -28,17 +36,37 @@ const passBenefits = [
 export function RegistrationSection() {
   const [status, setStatus] = useState<RegistrationStatus | null>(null);
 
-  useEffect(() => {
+  const fetchStatus = useCallback(() => {
     fetch("/api/registration/status")
       .then((r) => r.json())
       .then((data) => setStatus(data))
       .catch((err) => console.error("Could not fetch registration status:", err));
   }, []);
 
-  const passes = status?.passes ?? PASSES;
-  const badgeText = status?.badgeText ?? SLABS[ACTIVE_SLAB].badgeText;
-  const isClosed = status?.isClosed ?? REGISTRATION_CLOSED;
-  const closedMessage = status?.closedMessage ?? REGISTRATION_CLOSED_MESSAGE;
+  useEffect(() => {
+    fetchStatus();
+
+    // Check periodically for automatic Slab 3 launch
+    const interval = window.setInterval(fetchStatus, 15000);
+
+    // Exact timer targeting 12:00:00 PM IST
+    const msUntilOpen = SLAB_3_OPEN_TIME - Date.now();
+    let exactTimer: number | undefined;
+    if (msUntilOpen > 0 && msUntilOpen < 86400000) {
+      exactTimer = window.setTimeout(fetchStatus, msUntilOpen + 500);
+    }
+
+    return () => {
+      window.clearInterval(interval);
+      if (exactTimer) window.clearTimeout(exactTimer);
+    };
+  }, [fetchStatus]);
+
+  const currentSlabId = status?.slab ?? getActiveSlabId();
+  const passes = status?.passes ?? getPassesForSlab(currentSlabId);
+  const badgeText = status?.badgeText ?? SLABS[currentSlabId].badgeText;
+  const isClosed = status ? (status.isClosed ?? false) : isRegistrationClosed();
+  const closedMessage = status?.closedMessage ?? (isClosed ? REGISTRATION_CLOSED_MESSAGE : "");
 
   return (
     <section id="register" className="register-section">

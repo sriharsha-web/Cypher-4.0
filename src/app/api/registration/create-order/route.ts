@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPass, getPrice, calculateTeamPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE, ACTIVE_SLAB, REGISTRATION_CLOSED, REGISTRATION_CLOSED_MESSAGE } from "@/lib/passes";
+import { getPass, getPrice, calculateTeamPrice, MIN_TEAM_SIZE, MAX_TEAM_SIZE, getActiveSlabId, isRegistrationClosed, REGISTRATION_CLOSED_MESSAGE } from "@/lib/passes";
 import type { MemberAffiliation, PassId } from "@/lib/passes";
 import { getRazorpayInstance, generateRegistrationId } from "@/lib/razorpay";
 import { appendRegistration } from "@/lib/sheets";
 
 export async function POST(req: NextRequest) {
   try {
-    if (REGISTRATION_CLOSED) {
+    if (isRegistrationClosed()) {
       return NextResponse.json({ error: REGISTRATION_CLOSED_MESSAGE }, { status: 400 });
     }
 
     const body = await req.json();
     const { passId, teamName, teamLeaderName, contactNumber, email, collegeName, members, memberAffiliations } = body;
 
-    const slab = ACTIVE_SLAB;
+    const slab = getActiveSlabId();
 
     const pass = getPass(passId, slab);
     if (!pass) {

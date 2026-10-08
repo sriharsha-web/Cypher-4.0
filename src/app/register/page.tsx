@@ -5,7 +5,20 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowUpRight, ArrowLeft, Check, Plus, X, Users, CreditCard, Sparkles, AlertCircle, Loader2, CheckCircle2, XCircle, MessageSquare, GraduationCap, Globe, Lock } from "lucide-react";
 import { Header } from "@/components/cypher/Header";
-import { PASSES, getPrice, calculateTeamPrice, ACTIVE_SLAB, SLABS, MIN_TEAM_SIZE, MAX_TEAM_SIZE, REGISTRATION_CLOSED, REGISTRATION_CLOSED_MESSAGE } from "@/lib/passes";
+import {
+  PASSES,
+  getPrice,
+  calculateTeamPrice,
+  ACTIVE_SLAB,
+  SLABS,
+  MIN_TEAM_SIZE,
+  MAX_TEAM_SIZE,
+  REGISTRATION_CLOSED_MESSAGE,
+  SLAB_3_OPEN_TIME,
+  isRegistrationClosed,
+  getActiveSlabId,
+  getPassesForSlab,
+} from "@/lib/passes";
 import type { PassId, PassConfig, SlabId, MemberAffiliation } from "@/lib/passes";
 
 /* ─── Razorpay type ─── */
@@ -85,16 +98,36 @@ function RegisterPageInner() {
     passes: Record<PassId, PassConfig>;
     isClosed?: boolean;
     closedMessage?: string;
+    opensAt?: number;
   } | null>(null);
   const searchParams = useSearchParams();
 
   /* ── Fetch registration status ── */
-  useEffect(() => {
+  const fetchStatus = useCallback(() => {
     fetch("/api/registration/status")
       .then(r => r.json())
       .then(data => setRegStatus(data))
       .catch(err => console.error("Error fetching reg status:", err));
   }, []);
+
+  useEffect(() => {
+    fetchStatus();
+
+    // Check periodically for automatic Slab 3 launch
+    const interval = window.setInterval(fetchStatus, 15000);
+
+    // Exact timer targeting 12:00:00 PM IST
+    const msUntilOpen = SLAB_3_OPEN_TIME - Date.now();
+    let exactTimer: number | undefined;
+    if (msUntilOpen > 0 && msUntilOpen < 86400000) {
+      exactTimer = window.setTimeout(fetchStatus, msUntilOpen + 500);
+    }
+
+    return () => {
+      window.clearInterval(interval);
+      if (exactTimer) window.clearTimeout(exactTimer);
+    };
+  }, [fetchStatus]);
 
   /* ── Auto-select pass from URL ── */
   useEffect(() => {
@@ -119,13 +152,13 @@ function RegisterPageInner() {
     }
   }, [selectedPass, form.collegeName]);
 
-  const currentPasses = regStatus?.passes ?? PASSES;
-  const currentSlabId = regStatus?.slab ?? ACTIVE_SLAB;
+  const currentSlabId = regStatus?.slab ?? getActiveSlabId();
+  const currentPasses = regStatus?.passes ?? getPassesForSlab(currentSlabId);
   const pass = selectedPass ? currentPasses[selectedPass] : null;
   const teamSize = form.members.length;
 
-  const atrianPrice = currentPasses.atrians?.perPerson ?? 310;
-  const nonAtrianPrice = currentPasses["non-atrians"]?.perPerson ?? 330;
+  const atrianPrice = currentPasses.atrians?.perPerson ?? (currentSlabId === "slab-3" ? 330 : 310);
+  const nonAtrianPrice = currentPasses["non-atrians"]?.perPerson ?? (currentSlabId === "slab-3" ? 350 : 330);
 
   const atrianCount = selectedPass === "atrians"
     ? memberAffiliations.filter((a, idx) => idx === 0 || a === "atrian").length
@@ -137,9 +170,9 @@ function RegisterPageInner() {
   const price = selectedPass
     ? (calculateTeamPrice(selectedPass, memberAffiliations, currentSlabId) ?? 0)
     : 0;
-  const badgeText = regStatus?.badgeText ?? SLABS[ACTIVE_SLAB].badgeText;
-  const isClosed = regStatus?.isClosed ?? REGISTRATION_CLOSED;
-  const closedMessage = regStatus?.closedMessage ?? REGISTRATION_CLOSED_MESSAGE;
+  const badgeText = regStatus?.badgeText ?? SLABS[currentSlabId].badgeText;
+  const isClosed = regStatus ? (regStatus.isClosed ?? false) : isRegistrationClosed();
+  const closedMessage = regStatus?.closedMessage ?? (isClosed ? REGISTRATION_CLOSED_MESSAGE : "");
 
   /* ── Leader syncs to member 0 ── */
   const updateLeader = useCallback((name: string) => {

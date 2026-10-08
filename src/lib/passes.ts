@@ -4,7 +4,7 @@
  */
 
 export type PassId = "atrians" | "non-atrians";
-export type SlabId = "early-bird" | "slab-1" | "slab-2";
+export type SlabId = "early-bird" | "slab-1" | "slab-2" | "slab-3";
 
 export interface PassConfig {
   id: PassId;
@@ -132,23 +132,76 @@ export const SLABS: Record<SlabId, SlabConfig> = {
       },
     },
   },
+  "slab-3": {
+    id: "slab-3",
+    label: "Slab 3",
+    badgeText: "SLAB 3 PRICES",
+    passes: {
+      atrians: {
+        id: "atrians",
+        name: "ATRIANS",
+        description: "Entry-level orbital access for Atria personnel.",
+        perPerson: 330,
+        featured: false,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 660,
+          3: 990,
+          4: 1320,
+        },
+      },
+      "non-atrians": {
+        id: "non-atrians",
+        name: "NON-ATRIANS",
+        description: "Interstellar access for all external technical entities.",
+        perPerson: 350,
+        featured: true,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 700,
+          3: 1050,
+          4: 1400,
+        },
+      },
+    },
+  },
 };
 
-/** Whether registrations are currently closed between slabs */
+/**
+ * Slab 3 scheduled launch time: October 8, 2026, 12:00:00 PM IST (UTC+05:30)
+ */
+export const SLAB_3_OPEN_TIME = new Date("2026-10-08T12:00:00+05:30").getTime();
+
+/** Check if Slab 3 has launched / is currently active */
+export function isSlab3Live(): boolean {
+  return Date.now() >= SLAB_3_OPEN_TIME;
+}
+
+/** Check if registrations are currently closed (closed before 12:00 PM today) */
+export function isRegistrationClosed(): boolean {
+  return !isSlab3Live();
+}
+
+/** Dynamic active slab ID based on current time */
+export function getActiveSlabId(): SlabId {
+  return isSlab3Live() ? "slab-3" : "slab-2";
+}
+
+/** Static fallback boolean (evaluated dynamically at runtime via isRegistrationClosed()) */
 export const REGISTRATION_CLOSED = true;
 export const REGISTRATION_CLOSED_MESSAGE = "Slab 2 closed for registrations. Slab 3 opens at 12 PM today.";
 
-/** Active pricing slab - manually configurable */
+/** Static fallback slab (evaluated dynamically at runtime via getActiveSlabId()) */
 export const ACTIVE_SLAB: SlabId = "slab-2";
 
 /** Default passes based on active slab */
 export const PASSES: Record<PassId, PassConfig> = SLABS[ACTIVE_SLAB].passes;
 
-export function getPassesForSlab(slabId: SlabId = ACTIVE_SLAB): Record<PassId, PassConfig> {
-  return SLABS[slabId]?.passes ?? SLABS[ACTIVE_SLAB].passes;
+export function getPassesForSlab(slabId: SlabId = getActiveSlabId()): Record<PassId, PassConfig> {
+  return SLABS[slabId]?.passes ?? SLABS[getActiveSlabId()].passes;
 }
 
-export function getPass(id: string, slabId: SlabId = ACTIVE_SLAB): PassConfig | undefined {
+export function getPass(id: string, slabId: SlabId = getActiveSlabId()): PassConfig | undefined {
   const passes = getPassesForSlab(slabId);
   return passes[id as PassId];
 }
@@ -162,7 +215,7 @@ export type MemberAffiliation = "atrian" | "non-atrian";
 export function calculateTeamPrice(
   passId: string,
   memberAffiliations: MemberAffiliation[],
-  slabId: SlabId = ACTIVE_SLAB
+  slabId: SlabId = getActiveSlabId()
 ): number | undefined {
   const pass = getPass(passId, slabId);
   if (!pass) return undefined;
@@ -186,7 +239,7 @@ export function calculateTeamPrice(
   return total;
 }
 
-export function getPrice(passId: string, teamSize: number, slabId: SlabId = ACTIVE_SLAB): number | undefined {
+export function getPrice(passId: string, teamSize: number, slabId: SlabId = getActiveSlabId()): number | undefined {
   const pass = getPass(passId, slabId);
   if (!pass) return undefined;
   if (teamSize < 2 || teamSize > 4) return undefined;
