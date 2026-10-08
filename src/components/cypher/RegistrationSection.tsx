@@ -5,11 +5,13 @@ import { ArrowUpRight, Check, Sparkles, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import {
   SLABS,
-  SLAB_3_OPEN_TIME,
+  SLAB_4_OPEN_TIME,
   isRegistrationClosed,
   getActiveSlabId,
   getPassesForSlab,
   REGISTRATION_CLOSED_MESSAGE,
+  IS_LIMITED_TIME,
+  LIMITED_TIME_MESSAGE,
 } from "@/lib/passes";
 import type { PassConfig, PassId, SlabId } from "@/lib/passes";
 
@@ -21,6 +23,8 @@ interface RegistrationStatus {
   isClosed?: boolean;
   closedMessage?: string;
   opensAt?: number;
+  isLimitedTime?: boolean;
+  limitedTimeMessage?: string;
 }
 
 const passBenefits = [
@@ -46,11 +50,12 @@ export function RegistrationSection() {
   useEffect(() => {
     fetchStatus();
 
-    // Check periodically for automatic Slab 3 launch
+    // Check periodically for status updates
     const interval = window.setInterval(fetchStatus, 15000);
 
-    // Exact timer targeting 12:00:00 PM IST
-    const msUntilOpen = SLAB_3_OPEN_TIME - Date.now();
+    // Exact timer targeting 9:00:00 PM IST
+    const targetTime = status?.opensAt ?? SLAB_4_OPEN_TIME;
+    const msUntilOpen = targetTime - Date.now();
     let exactTimer: number | undefined;
     if (msUntilOpen > 0 && msUntilOpen < 86400000) {
       exactTimer = window.setTimeout(fetchStatus, msUntilOpen + 500);
@@ -60,13 +65,17 @@ export function RegistrationSection() {
       window.clearInterval(interval);
       if (exactTimer) window.clearTimeout(exactTimer);
     };
-  }, [fetchStatus]);
+  }, [fetchStatus, status?.opensAt]);
 
   const currentSlabId = status?.slab ?? getActiveSlabId();
   const passes = status?.passes ?? getPassesForSlab(currentSlabId);
   const badgeText = status?.badgeText ?? SLABS[currentSlabId].badgeText;
   const isClosed = status ? (status.isClosed ?? false) : isRegistrationClosed();
   const closedMessage = status?.closedMessage ?? (isClosed ? REGISTRATION_CLOSED_MESSAGE : "");
+  const isLimitedTime = status ? (status.isLimitedTime ?? IS_LIMITED_TIME) : IS_LIMITED_TIME;
+  const limitedTimeMessage = status?.limitedTimeMessage ?? LIMITED_TIME_MESSAGE;
+  const opensAt = status?.opensAt ?? SLAB_4_OPEN_TIME;
+  const isPendingOpen = isClosed && Date.now() < opensAt;
 
   return (
     <section id="register" className="register-section">
@@ -79,15 +88,23 @@ export function RegistrationSection() {
           </span>
         </div>
 
-        {isClosed && (
+        {isClosed ? (
           <div className="reg-sold-out-banner">
             <AlertCircle size={20} />
             <div>
-              <strong>Registrations Closed — House Full</strong>
-              <p>{closedMessage || "Registrations are closed. House Full!"}</p>
+              <strong>{isPendingOpen ? "Opening at 9:00 PM Tonight" : "Registrations Closed"}</strong>
+              <p>{closedMessage || "Registrations are closed."}</p>
             </div>
           </div>
-        )}
+        ) : isLimitedTime ? (
+          <div className="reg-limited-banner">
+            <Sparkles size={20} />
+            <div>
+              <strong>SLAB 4 ACTIVE — LIMITED TIME ACCESS</strong>
+              <p>{limitedTimeMessage}</p>
+            </div>
+          </div>
+        ) : null}
 
         <div className="passes">
           <article className="pass-card">
@@ -107,7 +124,7 @@ export function RegistrationSection() {
             </ul>
             {isClosed ? (
               <button className="button button-outline pass-btn pass-btn-disabled" disabled>
-                House Full
+                {isPendingOpen ? "Opens at 9:00 PM" : "House Full"}
               </button>
             ) : (
               <Link
@@ -137,7 +154,7 @@ export function RegistrationSection() {
             </ul>
             {isClosed ? (
               <button className="button button-acid pass-btn pass-btn-disabled" disabled>
-                House Full
+                {isPendingOpen ? "Opens at 9:00 PM" : "House Full"}
               </button>
             ) : (
               <Link

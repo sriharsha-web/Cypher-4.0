@@ -5,7 +5,10 @@ import {
   getActiveSlabId,
   isRegistrationClosed,
   REGISTRATION_CLOSED_MESSAGE,
-  SLAB_3_OPEN_TIME,
+  SLAB_4_OPEN_TIME,
+  getBadgeText,
+  IS_LIMITED_TIME,
+  LIMITED_TIME_MESSAGE,
 } from "@/lib/passes";
 import type { SlabId } from "@/lib/passes";
 
@@ -21,12 +24,14 @@ export async function GET() {
     return NextResponse.json({
       slab,
       label: currentSlab.label,
-      badgeText: currentSlab.badgeText,
+      badgeText: getBadgeText(),
       passes: currentSlab.passes,
       registeredCount,
       isClosed,
       closedMessage: isClosed ? REGISTRATION_CLOSED_MESSAGE : "",
-      opensAt: SLAB_3_OPEN_TIME,
+      opensAt: SLAB_4_OPEN_TIME,
+      isLimitedTime: IS_LIMITED_TIME,
+      limitedTimeMessage: LIMITED_TIME_MESSAGE,
     });
   } catch (error) {
     console.error("Failed to fetch registration status:", error);
@@ -36,12 +41,14 @@ export async function GET() {
     return NextResponse.json({
       slab,
       label: fallbackSlab.label,
-      badgeText: fallbackSlab.badgeText,
+      badgeText: getBadgeText(),
       passes: fallbackSlab.passes,
       registeredCount: 0,
       isClosed,
       closedMessage: isClosed ? REGISTRATION_CLOSED_MESSAGE : "",
-      opensAt: SLAB_3_OPEN_TIME,
+      opensAt: SLAB_4_OPEN_TIME,
+      isLimitedTime: IS_LIMITED_TIME,
+      limitedTimeMessage: LIMITED_TIME_MESSAGE,
     });
   }
 }

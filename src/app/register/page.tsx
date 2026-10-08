@@ -14,10 +14,12 @@ import {
   MIN_TEAM_SIZE,
   MAX_TEAM_SIZE,
   REGISTRATION_CLOSED_MESSAGE,
-  SLAB_3_OPEN_TIME,
+  SLAB_4_OPEN_TIME,
   isRegistrationClosed,
   getActiveSlabId,
   getPassesForSlab,
+  IS_LIMITED_TIME,
+  LIMITED_TIME_MESSAGE,
 } from "@/lib/passes";
 import type { PassId, PassConfig, SlabId, MemberAffiliation } from "@/lib/passes";
 
@@ -99,6 +101,8 @@ function RegisterPageInner() {
     isClosed?: boolean;
     closedMessage?: string;
     opensAt?: number;
+    isLimitedTime?: boolean;
+    limitedTimeMessage?: string;
   } | null>(null);
   const searchParams = useSearchParams();
 
@@ -113,11 +117,12 @@ function RegisterPageInner() {
   useEffect(() => {
     fetchStatus();
 
-    // Check periodically for automatic Slab 3 launch
+    // Check periodically for status updates
     const interval = window.setInterval(fetchStatus, 15000);
 
-    // Exact timer targeting 12:00:00 PM IST
-    const msUntilOpen = SLAB_3_OPEN_TIME - Date.now();
+    // Exact timer targeting 9:00:00 PM IST
+    const targetTime = regStatus?.opensAt ?? SLAB_4_OPEN_TIME;
+    const msUntilOpen = targetTime - Date.now();
     let exactTimer: number | undefined;
     if (msUntilOpen > 0 && msUntilOpen < 86400000) {
       exactTimer = window.setTimeout(fetchStatus, msUntilOpen + 500);
@@ -127,7 +132,7 @@ function RegisterPageInner() {
       window.clearInterval(interval);
       if (exactTimer) window.clearTimeout(exactTimer);
     };
-  }, [fetchStatus]);
+  }, [fetchStatus, regStatus?.opensAt]);
 
   /* ── Auto-select pass from URL ── */
   useEffect(() => {
@@ -157,8 +162,8 @@ function RegisterPageInner() {
   const pass = selectedPass ? currentPasses[selectedPass] : null;
   const teamSize = form.members.length;
 
-  const atrianPrice = currentPasses.atrians?.perPerson ?? (currentSlabId === "slab-3" ? 330 : 310);
-  const nonAtrianPrice = currentPasses["non-atrians"]?.perPerson ?? (currentSlabId === "slab-3" ? 350 : 330);
+  const atrianPrice = currentPasses.atrians?.perPerson ?? (currentSlabId === "slab-4" ? 350 : currentSlabId === "slab-3" ? 330 : 310);
+  const nonAtrianPrice = currentPasses["non-atrians"]?.perPerson ?? (currentSlabId === "slab-4" ? 380 : currentSlabId === "slab-3" ? 350 : 330);
 
   const atrianCount = selectedPass === "atrians"
     ? memberAffiliations.filter((a, idx) => idx === 0 || a === "atrian").length
@@ -173,6 +178,10 @@ function RegisterPageInner() {
   const badgeText = regStatus?.badgeText ?? SLABS[currentSlabId].badgeText;
   const isClosed = regStatus ? (regStatus.isClosed ?? false) : isRegistrationClosed();
   const closedMessage = regStatus?.closedMessage ?? (isClosed ? REGISTRATION_CLOSED_MESSAGE : "");
+  const isLimitedTime = regStatus ? (regStatus.isLimitedTime ?? IS_LIMITED_TIME) : IS_LIMITED_TIME;
+  const limitedTimeMessage = regStatus?.limitedTimeMessage ?? LIMITED_TIME_MESSAGE;
+  const opensAt = regStatus?.opensAt ?? SLAB_4_OPEN_TIME;
+  const isPendingOpen = isClosed && Date.now() < opensAt;
 
   /* ── Leader syncs to member 0 ── */
   const updateLeader = useCallback((name: string) => {
@@ -405,15 +414,23 @@ function RegisterPageInner() {
                 </span>
               </div>
 
-              {isClosed && (
+              {isClosed ? (
                 <div className="reg-sold-out-banner">
                   <AlertCircle size={20} />
                   <div>
-                    <strong>Registrations Closed — House Full</strong>
-                    <p>{closedMessage || "Registrations are closed. House Full!"}</p>
+                    <strong>{isPendingOpen ? "Opening at 9:00 PM Tonight" : "Registrations Closed"}</strong>
+                    <p>{closedMessage || "Registrations are closed."}</p>
                   </div>
                 </div>
-              )}
+              ) : isLimitedTime ? (
+                <div className="reg-limited-banner">
+                  <Sparkles size={20} />
+                  <div>
+                    <strong>SLAB 4 ACTIVE — LIMITED TIME ACCESS</strong>
+                    <p>{limitedTimeMessage}</p>
+                  </div>
+                </div>
+              ) : null}
 
               <div className="reg-passes">
                 {Object.values(currentPasses).map((p) => (
@@ -427,7 +444,7 @@ function RegisterPageInner() {
                     </ul>
                     {isClosed ? (
                       <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn pass-btn-disabled`} disabled>
-                        House Full
+                        {isPendingOpen ? "Opens at 9:00 PM" : "House Full"}
                       </button>
                     ) : (
                       <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn`} onClick={() => selectPass(p.id)}>
@@ -449,15 +466,23 @@ function RegisterPageInner() {
               <p className="mono-label">REGISTRATION / {pass.name}</p>
               <h1>REGISTER YOUR TEAM</h1>
 
-              {isClosed && (
+              {isClosed ? (
                 <div className="reg-sold-out-banner">
                   <AlertCircle size={20} />
                   <div>
-                    <strong>Registrations Closed — House Full</strong>
-                    <p>{closedMessage || "Registrations are closed. House Full!"}</p>
+                    <strong>{isPendingOpen ? "Opening at 9:00 PM Tonight" : "Registrations Closed"}</strong>
+                    <p>{closedMessage || "Registrations are closed."}</p>
                   </div>
                 </div>
-              )}
+              ) : isLimitedTime ? (
+                <div className="reg-limited-banner">
+                  <Sparkles size={20} />
+                  <div>
+                    <strong>SLAB 4 ACTIVE — LIMITED TIME ACCESS</strong>
+                    <p>{limitedTimeMessage}</p>
+                  </div>
+                </div>
+              ) : null}
 
               <div className="reg-form-layout">
                 {/* Form */}
@@ -614,7 +639,7 @@ function RegisterPageInner() {
 
                   {isClosed ? (
                     <button className="button button-outline reg-pay-btn pass-btn-disabled" disabled>
-                      House Full
+                      {isPendingOpen ? "Opens at 9:00 PM" : "House Full"}
                     </button>
                   ) : (
                     <button className="button button-acid reg-pay-btn" onClick={handleSubmit} disabled={submitting}>

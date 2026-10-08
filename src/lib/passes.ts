@@ -4,7 +4,7 @@
  */
 
 export type PassId = "atrians" | "non-atrians";
-export type SlabId = "early-bird" | "slab-1" | "slab-2" | "slab-3";
+export type SlabId = "early-bird" | "slab-1" | "slab-2" | "slab-3" | "slab-4";
 
 export interface PassConfig {
   id: PassId;
@@ -102,7 +102,7 @@ export const SLABS: Record<SlabId, SlabConfig> = {
   "slab-2": {
     id: "slab-2",
     label: "Slab 2",
-    badgeText: "REGISTRATIONS CLOSED • HOUSE FULL",
+    badgeText: "SLAB 2 PRICES",
     passes: {
       atrians: {
         id: "atrians",
@@ -135,7 +135,7 @@ export const SLABS: Record<SlabId, SlabConfig> = {
   "slab-3": {
     id: "slab-3",
     label: "Slab 3",
-    badgeText: "REGISTRATIONS CLOSED • HOUSE FULL",
+    badgeText: "SLAB 3 PRICES",
     passes: {
       atrians: {
         id: "atrians",
@@ -165,34 +165,78 @@ export const SLABS: Record<SlabId, SlabConfig> = {
       },
     },
   },
+  "slab-4": {
+    id: "slab-4",
+    label: "Slab 4",
+    badgeText: "SLAB 4 • LIMITED TIME ONLY",
+    passes: {
+      atrians: {
+        id: "atrians",
+        name: "ATRIANS",
+        description: "Entry-level orbital access for Atria personnel.",
+        perPerson: 350,
+        featured: false,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 700,
+          3: 1050,
+          4: 1400,
+        },
+      },
+      "non-atrians": {
+        id: "non-atrians",
+        name: "NON-ATRIANS",
+        description: "Interstellar access for all external technical entities.",
+        perPerson: 380,
+        featured: true,
+        benefits: ["Team of up to 4 members", ...SHARED_BENEFITS],
+        pricing: {
+          2: 760,
+          3: 1140,
+          4: 1520,
+        },
+      },
+    },
+  },
 };
 
-/**
- * Slab 3 scheduled launch time: October 8, 2026, 12:00:00 PM IST (UTC+05:30)
- */
 export const SLAB_3_OPEN_TIME = new Date("2026-10-08T12:00:00+05:30").getTime();
 
-/** Check if Slab 3 has launched / is currently active */
-export function isSlab3Live(): boolean {
-  return true;
+/**
+ * Slab 4 scheduled launch time: October 8, 2026, 9:00:00 PM IST (UTC+05:30)
+ */
+export const SLAB_4_OPEN_TIME = new Date("2026-10-08T21:00:00+05:30").getTime();
+
+/** Check if Slab 4 has launched / is currently active */
+export function isSlab4Live(): boolean {
+  return Date.now() >= SLAB_4_OPEN_TIME;
 }
 
-/** Check if registrations are currently closed (House Full) */
+/** Check if registrations are currently closed (opens at exact 9:00 PM tonight) */
 export function isRegistrationClosed(): boolean {
-  return true;
+  return !isSlab4Live();
 }
 
-/** Dynamic active slab ID based on current time */
+/** Dynamic active slab ID */
 export function getActiveSlabId(): SlabId {
-  return "slab-3";
+  return "slab-4";
+}
+
+/** Dynamic badge text */
+export function getBadgeText(): string {
+  return isSlab4Live() ? "SLAB 4 • LIMITED TIME ONLY" : "SLAB 4 OPENS AT 9 PM TONIGHT";
 }
 
 /** Static fallback boolean (evaluated dynamically at runtime via isRegistrationClosed()) */
 export const REGISTRATION_CLOSED = true;
-export const REGISTRATION_CLOSED_MESSAGE = "Registrations are closed. House Full!";
+export const REGISTRATION_CLOSED_MESSAGE = "Slab 4 registrations open at 9:00 PM tonight for a strictly limited time.";
+
+/** Limited time indicator */
+export const IS_LIMITED_TIME = true;
+export const LIMITED_TIME_MESSAGE = "Slab 4 registrations are now open for a strictly limited time. Grab your pass before slots close!";
 
 /** Static fallback slab (evaluated dynamically at runtime via getActiveSlabId()) */
-export const ACTIVE_SLAB: SlabId = "slab-3";
+export const ACTIVE_SLAB: SlabId = "slab-4";
 
 /** Default passes based on active slab */
 export const PASSES: Record<PassId, PassConfig> = SLABS[ACTIVE_SLAB].passes;

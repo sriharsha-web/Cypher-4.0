@@ -2337,3 +2337,37 @@ main[id] {
   color: rgba(245, 244, 237, 0.85);
   line-height: 1.45;
 }
+
+.reg-limited-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  background: rgba(223, 255, 0, 0.08);
+  border: 2px solid var(--acid);
+  box-shadow: 6px 6px 0 var(--ink);
+  color: var(--white);
+}
+
+.reg-limited-banner svg {
+  color: var(--acid);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.reg-limited-banner strong {
+  display: block;
+  font: 700 13px var(--font-mono);
+  letter-spacing: 0.05em;
+  color: var(--acid);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.reg-limited-banner p {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(245, 244, 237, 0.9);
+  line-height: 1.45;
+}
