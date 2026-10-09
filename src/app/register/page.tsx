@@ -136,12 +136,11 @@ function RegisterPageInner() {
 
   /* ── Auto-select pass from URL ── */
   useEffect(() => {
-    if (isClosed) return;
     const passParam = searchParams.get("pass");
     if (passParam && PASSES[passParam as PassId]) {
       selectPass(passParam as PassId);
     }
-  }, [isClosed]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Auto-prompt for Member 2 if Atrians pass is active and hasn't prompted yet ── */
   useEffect(() => {
@@ -372,7 +371,6 @@ function RegisterPageInner() {
 
   /* ── Select pass and go to form ── */
   const selectPass = useCallback((id: PassId) => {
-    if (isClosed) return;
     setSelectedPass(id);
     setForm({
       teamName: "",
