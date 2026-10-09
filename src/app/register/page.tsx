@@ -136,11 +136,12 @@ function RegisterPageInner() {
 
   /* ── Auto-select pass from URL ── */
   useEffect(() => {
+    if (isClosed) return;
     const passParam = searchParams.get("pass");
     if (passParam && PASSES[passParam as PassId]) {
       selectPass(passParam as PassId);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isClosed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Auto-prompt for Member 2 if Atrians pass is active and hasn't prompted yet ── */
   useEffect(() => {
@@ -371,6 +372,7 @@ function RegisterPageInner() {
 
   /* ── Select pass and go to form ── */
   const selectPass = useCallback((id: PassId) => {
+    if (isClosed) return;
     setSelectedPass(id);
     setForm({
       teamName: "",
@@ -418,8 +420,8 @@ function RegisterPageInner() {
                 <div className="reg-sold-out-banner">
                   <AlertCircle size={20} />
                   <div>
-                    <strong>{isPendingOpen ? "Opening at 9:00 PM Tonight" : "Registrations Closed"}</strong>
-                    <p>{closedMessage || "Registrations are closed."}</p>
+                    <strong>Registrations Closed — House Full</strong>
+                    <p>{closedMessage || "Registrations are closed. House Full!"}</p>
                   </div>
                 </div>
               ) : isLimitedTime ? (
@@ -444,7 +446,7 @@ function RegisterPageInner() {
                     </ul>
                     {isClosed ? (
                       <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn pass-btn-disabled`} disabled>
-                        {isPendingOpen ? "Opens at 9:00 PM" : "House Full"}
+                        House Full
                       </button>
                     ) : (
                       <button className={`button ${p.featured ? "button-acid" : "button-outline"} pass-btn`} onClick={() => selectPass(p.id)}>
@@ -470,8 +472,8 @@ function RegisterPageInner() {
                 <div className="reg-sold-out-banner">
                   <AlertCircle size={20} />
                   <div>
-                    <strong>{isPendingOpen ? "Opening at 9:00 PM Tonight" : "Registrations Closed"}</strong>
-                    <p>{closedMessage || "Registrations are closed."}</p>
+                    <strong>Registrations Closed — House Full</strong>
+                    <p>{closedMessage || "Registrations are closed. House Full!"}</p>
                   </div>
                 </div>
               ) : isLimitedTime ? (
@@ -639,7 +641,7 @@ function RegisterPageInner() {
 
                   {isClosed ? (
                     <button className="button button-outline reg-pay-btn pass-btn-disabled" disabled>
-                      {isPendingOpen ? "Opens at 9:00 PM" : "House Full"}
+                      House Full
                     </button>
                   ) : (
                     <button className="button button-acid reg-pay-btn" onClick={handleSubmit} disabled={submitting}>

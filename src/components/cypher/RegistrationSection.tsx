@@ -92,8 +92,8 @@ export function RegistrationSection() {
           <div className="reg-sold-out-banner">
             <AlertCircle size={20} />
             <div>
-              <strong>{isPendingOpen ? "Opening at 9:00 PM Tonight" : "Registrations Closed"}</strong>
-              <p>{closedMessage || "Registrations are closed."}</p>
+              <strong>Registrations Closed — House Full</strong>
+              <p>{closedMessage || "Registrations are closed. House Full!"}</p>
             </div>
           </div>
         ) : isLimitedTime ? (
@@ -124,7 +124,7 @@ export function RegistrationSection() {
             </ul>
             {isClosed ? (
               <button className="button button-outline pass-btn pass-btn-disabled" disabled>
-                {isPendingOpen ? "Opens at 9:00 PM" : "House Full"}
+                House Full
               </button>
             ) : (
               <Link
@@ -154,7 +154,7 @@ export function RegistrationSection() {
             </ul>
             {isClosed ? (
               <button className="button button-acid pass-btn pass-btn-disabled" disabled>
-                {isPendingOpen ? "Opens at 9:00 PM" : "House Full"}
+                House Full
               </button>
             ) : (
               <Link

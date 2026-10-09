@@ -168,7 +168,7 @@ export const SLABS: Record<SlabId, SlabConfig> = {
   "slab-4": {
     id: "slab-4",
     label: "Slab 4",
-    badgeText: "SLAB 4 • LIMITED TIME ONLY",
+    badgeText: "REGISTRATIONS CLOSED • HOUSE FULL",
     passes: {
       atrians: {
         id: "atrians",
@@ -209,12 +209,12 @@ export const SLAB_4_OPEN_TIME = new Date("2026-10-08T21:00:00+05:30").getTime();
 
 /** Check if Slab 4 has launched / is currently active */
 export function isSlab4Live(): boolean {
-  return Date.now() >= SLAB_4_OPEN_TIME;
+  return true;
 }
 
-/** Check if registrations are currently closed (opens at exact 9:00 PM tonight) */
+/** Check if registrations are currently closed (House Full) */
 export function isRegistrationClosed(): boolean {
-  return !isSlab4Live();
+  return true;
 }
 
 /** Dynamic active slab ID */
@@ -224,16 +224,16 @@ export function getActiveSlabId(): SlabId {
 
 /** Dynamic badge text */
 export function getBadgeText(): string {
-  return isSlab4Live() ? "SLAB 4 • LIMITED TIME ONLY" : "SLAB 4 OPENS AT 9 PM TONIGHT";
+  return "REGISTRATIONS CLOSED • HOUSE FULL";
 }
 
 /** Static fallback boolean (evaluated dynamically at runtime via isRegistrationClosed()) */
 export const REGISTRATION_CLOSED = true;
-export const REGISTRATION_CLOSED_MESSAGE = "Slab 4 registrations open at 9:00 PM tonight for a strictly limited time.";
+export const REGISTRATION_CLOSED_MESSAGE = "Registrations are closed. House Full!";
 
 /** Limited time indicator */
-export const IS_LIMITED_TIME = true;
-export const LIMITED_TIME_MESSAGE = "Slab 4 registrations are now open for a strictly limited time. Grab your pass before slots close!";
+export const IS_LIMITED_TIME = false;
+export const LIMITED_TIME_MESSAGE = "";
 
 /** Static fallback slab (evaluated dynamically at runtime via getActiveSlabId()) */
 export const ACTIVE_SLAB: SlabId = "slab-4";
